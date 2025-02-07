@@ -1,13 +1,18 @@
 package me.putindeer.puebloHG;
 
+import com.google.common.util.concurrent.Service;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Event;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin {
+    public static Main pl;
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
-
+        pl = this;
+        new Events(pl);
     }
 
     @Override
