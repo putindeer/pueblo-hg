@@ -1,0 +1,7 @@
+name: PuebloHG
+version: ${project.version}
+main: me.putindeer.puebloHG.Main
+api-version: '1.21'
+author: putindeer
+description: Hunger Games Plugin
+website:
