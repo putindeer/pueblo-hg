@@ -40,7 +40,7 @@ public class HGEvents implements Listener {
                 plugin.utils.chat("&7Ping: &3" + p.getPing() + " &8| &7Tps: &3" + new DecimalFormat("##").format(plugin.getServer().getTPS()[0])));
 
         if (p.getGameMode() == GameMode.SURVIVAL) {
-            Location loc = new Location(Bukkit.getWorld("world"), 0.5, -29, 0.5);
+            Location loc = new Location(Bukkit.getWorld("world"), -999.5, 100, 1000.5);
             p.teleport(loc);
             restorePlayer(p);
         }
