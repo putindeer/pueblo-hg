@@ -4,4 +4,9 @@ main: me.putindeer.puebloHG.Main
 api-version: '1.21'
 author: putindeer
 description: Hunger Games Plugin
-website:
+website: github.com/putindeer
+
+commands:
+  start:
+    description: Inicia una partida de Hunger Games
+    permission: hg.admin

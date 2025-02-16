@@ -1,0 +1,161 @@
+package me.putindeer.puebloHG.managers;
+
+import lombok.Getter;
+import me.putindeer.puebloHG.Main;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Scatter implements Listener {
+    private final Main plugin;
+    List<Player> scattering = new ArrayList<>();
+    @Getter
+    public boolean scatter = false;
+
+    public Scatter(Main plugin) {
+        this.plugin = plugin;
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
+
+    public void scatter() {
+        scatter = true;
+        plugin.utils.broadcast("&8[&3HG&8] &7La partida está por comenzar. Esperen un momento.");
+        Iterator<Location> iterator = locations.iterator();
+        List<Player> players = Bukkit.getOnlinePlayers().stream()
+                .filter(p -> p.getGameMode() != GameMode.SPECTATOR)
+                .collect(Collectors.toList());
+        Collections.shuffle(players);
+        Iterator<Player> playerIterator = players.iterator();
+        final int[] scattered = {0};
+        int maximumPlayers = Math.min(players.size(), 44);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!iterator.hasNext()) {
+                    while (playerIterator.hasNext()) {
+                        Player p = playerIterator.next();
+                        p.setGameMode(GameMode.SPECTATOR);
+                        p.teleport(new Location(Bukkit.getWorld("world"), -0.5, 77, 0.5));
+                        plugin.utils.message(p, "&8[&3HG&8] &7Ahora estás en modo espectador ya que el límite de jugadores se alcanzó.");
+                    }
+                    start();
+                    cancel();
+                    return;
+                }
+
+                if (playerIterator.hasNext()) {
+                    Location nextLocation = iterator.next();
+                    Player p = playerIterator.next();
+                    p.teleportAsync(nextLocation);
+                    scattering.add(p);
+                    scattered[0]++;
+                    plugin.utils.broadcast("&8[&7" + scattered[0] + "&8/&7" + maximumPlayers + "&8] &3" + p.getName());
+                } else {start(); cancel();}
+            }
+        }.runTaskTimer(plugin, 0L, 5L);
+
+    }
+
+    public void start() {
+        plugin.utils.broadcast("&8[&3HG&8] &7El TP ha terminado. La partida comenzará en 10 segundos.");
+        String[] colors = {
+                "&#00FF00", "&#1CE300", "&#39C600", "&#55AA00", "&#718E00",
+                "&#8E7100", "&#AA5500", "&#C63900", "&#E31C00", "&#FF0000"
+        };
+
+        final int[] counter = {10};
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (counter[0] <= 0) {
+                    Main.alivePlayers = scattering.stream().map(Player::getName).collect(Collectors.toSet());
+                    scattering.clear();
+                    Bukkit.getOnlinePlayers().forEach(p -> p.showTitle(Title.title(plugin.utils.chat("&b¡La partida ha empezado!"), plugin.utils.chat("&cBuena suerte"))));
+
+                    cancel();
+                    return;
+                }
+
+                String color = colors[10 - counter[0]];
+                int finalI = counter[0];
+
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    player.showTitle(Title.title(plugin.utils.chat(color + finalI), Component.empty()));
+                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 1);
+                }
+
+                counter[0]--;
+            }
+        }.runTaskTimer(plugin, 0L, 20L);
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        if (!e.hasExplicitlyChangedBlock()) return;
+        Player p = e.getPlayer();
+        if (!scattering.contains(p)) return;
+        p.sendActionBar(plugin.utils.chat("&cNo tienes permitido moverte aún. Espera al scatter."));
+        e.setCancelled(true);
+    }
+
+    List<Location> locations = Arrays.asList(
+            new Location(Bukkit.getWorld("world"), 12.5, 73, 13.5),
+            new Location(Bukkit.getWorld("world"), 8.5, 73, 15.5),
+            new Location(Bukkit.getWorld("world"), 3.5, 73, 17.5),
+            new Location(Bukkit.getWorld("world"), -0.5, 73, 18.5),
+            new Location(Bukkit.getWorld("world"), -4.5, 73, 17.5),
+            new Location(Bukkit.getWorld("world"), -9.5, 73, 15.5),
+            new Location(Bukkit.getWorld("world"), -13.5, 73, 13.5),
+            new Location(Bukkit.getWorld("world"), -15.5, 73, 9.5),
+            new Location(Bukkit.getWorld("world"), -17.5, 73, 4.5),
+            new Location(Bukkit.getWorld("world"), -18.5, 73, 0.5),
+            new Location(Bukkit.getWorld("world"), -17.5, 73, -3.5),
+            new Location(Bukkit.getWorld("world"), -15.5, 73, -8.5),
+            new Location(Bukkit.getWorld("world"), -13.5, 73, -12.5),
+            new Location(Bukkit.getWorld("world"), -9.5, 73, -14.5),
+            new Location(Bukkit.getWorld("world"), -4.5, 73, -16.5),
+            new Location(Bukkit.getWorld("world"), -0.5, 73, -17.5),
+            new Location(Bukkit.getWorld("world"), 3.5, 73, -16.5),
+            new Location(Bukkit.getWorld("world"), 8.5, 73, -14.5),
+            new Location(Bukkit.getWorld("world"), 12.5, 73, -12.5),
+            new Location(Bukkit.getWorld("world"), 14.5, 73, -8.5),
+            new Location(Bukkit.getWorld("world"), 16.5, 73, -3.5),
+            new Location(Bukkit.getWorld("world"), 17.5, 73, 0.5),
+            new Location(Bukkit.getWorld("world"), 16.5, 73, 4.5),
+            new Location(Bukkit.getWorld("world"), 14.5, 73, 9.5),
+            new Location(Bukkit.getWorld("world"), 11.5, 73, -3.5),
+            new Location(Bukkit.getWorld("world"), 12.5, 73, 0.5),
+            new Location(Bukkit.getWorld("world"), 11.5, 73, 4.5),
+            new Location(Bukkit.getWorld("world"), 10.5, 73, 8.5),
+            new Location(Bukkit.getWorld("world"), 7.5, 73, 11.5),
+            new Location(Bukkit.getWorld("world"), 3.5, 73, 12.5),
+            new Location(Bukkit.getWorld("world"), -0.5, 73, 13.5),
+            new Location(Bukkit.getWorld("world"), -4.5, 73, 12.5),
+            new Location(Bukkit.getWorld("world"), -8.5, 73, 11.5),
+            new Location(Bukkit.getWorld("world"), -11.5, 73, 8.5),
+            new Location(Bukkit.getWorld("world"), -12.5, 73, 4.5),
+            new Location(Bukkit.getWorld("world"), -13.5, 73, 0.5),
+            new Location(Bukkit.getWorld("world"), -12.5, 73, -3.5),
+            new Location(Bukkit.getWorld("world"), -11.5, 73, -7.5),
+            new Location(Bukkit.getWorld("world"), -8.5, 73, -10.5),
+            new Location(Bukkit.getWorld("world"), -4.5, 73, -11.5),
+            new Location(Bukkit.getWorld("world"), -0.5, 73, -12.5),
+            new Location(Bukkit.getWorld("world"), 3.5, 73, -11.5),
+            new Location(Bukkit.getWorld("world"), 7.5, 73, -10.5),
+            new Location(Bukkit.getWorld("world"), 10.5, 73, -7.5)
+    );
+
+}
