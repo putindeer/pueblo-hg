@@ -16,6 +16,9 @@ public final class Main extends JavaPlugin {
     public Scatter scatter;
     public static Set<String> alivePlayers = new HashSet<>();
     public Map<UUID, FastBoard> boards = new HashMap<>();
+    public String timer = "";
+    public boolean started = false;
+    public boolean finalized = false;
 
     @Override
     public void onEnable() {

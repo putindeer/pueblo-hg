@@ -11,13 +11,24 @@ public class Scoreboards {
     public static void updateBoard(FastBoard board) {
         Component headfooter = plugin.utils.chat("&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r&7&m &r");
 
-        board.updateLines(
-                headfooter,
-                plugin.utils.chat("&oPlayers &r&8» &3" + playingCount()),
-                Component.empty(),
-                plugin.utils.chat("&oPing &r&8» &3" + board.getPlayer().getPing()),
-                headfooter
-        );
+        if (!plugin.started) {
+            board.updateLines(
+                    headfooter,
+                    plugin.utils.chat("Players: &3" + playingCount()),
+                    Component.empty(),
+                    plugin.utils.chat("Ping: &3" + board.getPlayer().getPing()),
+                    headfooter
+            );
+        } else if (plugin.started) {
+            board.updateLines(
+                    headfooter,
+                    plugin.utils.chat("Players: &3" + playingCount()),
+                    plugin.utils.chat("Timer: &3" + plugin.timer),
+                    Component.empty(),
+                    plugin.utils.chat("Ping: &3" + board.getPlayer().getPing()),
+                    headfooter
+            );
+        }
     }
 
     public static Integer playingCount() {

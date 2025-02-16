@@ -5,14 +5,14 @@ import fr.mrmicky.fastboard.adventure.FastBoard;
 import me.putindeer.puebloHG.Main;
 import org.bukkit.*;
 import org.bukkit.entity.*;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
@@ -99,20 +99,13 @@ public class HGEvents implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
         if (event.getClickedBlock() == null) return;
-        switch (event.getClickedBlock().getType()) {
-            case OAK_TRAPDOOR, SPRUCE_TRAPDOOR, BIRCH_TRAPDOOR, JUNGLE_TRAPDOOR, ACACIA_TRAPDOOR, DARK_OAK_TRAPDOOR,
-                 CRIMSON_TRAPDOOR, WARPED_TRAPDOOR, MANGROVE_TRAPDOOR, PALE_OAK_TRAPDOOR,
-                 CHISELED_BOOKSHELF, FLOWER_POT, SWEET_BERRY_BUSH, CANDLE,
-                 CYAN_CANDLE,LIGHT_BLUE_CANDLE, BREWING_STAND -> event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onEntityDamage(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player p)) return;
-        if (p.getGameMode().equals(GameMode.CREATIVE)) return;
-        if (event.getEntityType() == EntityType.PAINTING || event.getEntityType() == EntityType.ITEM_FRAME) {
+        Material type = event.getClickedBlock().getType();
+        if (type.name().startsWith("POTTED_") || type.name().endsWith("_TRAPDOOR") || type.name().endsWith("_CANDLE")) {
             event.setCancelled(true);
+        }
+        switch (type) {
+            case CHISELED_BOOKSHELF, FLOWER_POT, SWEET_BERRY_BUSH, CANDLE, BREWING_STAND, CAULDRON,
+                 WATER_CAULDRON, LAVA_CAULDRON, POWDER_SNOW_CAULDRON -> event.setCancelled(true);
         }
     }
 
@@ -124,12 +117,27 @@ public class HGEvents implements Listener {
 
     @EventHandler
     public void onPlayerBedEnter(PlayerBedEnterEvent event) {
-        if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
+        Player p = event.getPlayer();
+        if (p.getGameMode().equals(GameMode.CREATIVE)) return;
         event.setCancelled(true);
+        event.setUseBed(Event.Result.DENY);
+        p.setRespawnLocation(null);
     }
 
     @EventHandler
     public void onAnvil(AnvilDamagedEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onHangingPlace(HangingPlaceEvent event) {
+        if (event.getPlayer() != null && event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onHangingBreak(HangingBreakByEntityEvent event) {
+        if (event.getRemover() instanceof Player p && p.getGameMode() == GameMode.CREATIVE) return;
         event.setCancelled(true);
     }
 
@@ -158,7 +166,26 @@ public class HGEvents implements Listener {
     }
 
     @EventHandler
+    public void onDecoratedPotHit(ProjectileHitEvent event) {
+        if (event.getHitBlock() != null && event.getHitBlock().getType() == Material.DECORATED_POT) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        if (event.getBlock().getType() == Material.DECORATED_POT) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         event.setShouldDropExperience(false);
+        if (plugin.started) {
+            Player p = event.getPlayer();
+            p.teleport(new Location(p.getWorld(), 0, 94, 11));
+            p.setGameMode(GameMode.SPECTATOR);
+        }
     }
 }

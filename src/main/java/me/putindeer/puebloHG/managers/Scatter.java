@@ -4,10 +4,7 @@ import lombok.Getter;
 import me.putindeer.puebloHG.Main;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,6 +26,9 @@ public class Scatter implements Listener {
     }
 
     public void scatter() {
+        World world = Bukkit.getWorld("world");
+        assert world != null;
+        world.setPVP(false);
         scatter = true;
         plugin.utils.broadcast("&8[&3HG&8] &7La partida está por comenzar. Esperen un momento.");
         Iterator<Location> iterator = locations.iterator();
@@ -84,6 +84,16 @@ public class Scatter implements Listener {
                     Main.alivePlayers = scattering.stream().map(Player::getName).collect(Collectors.toSet());
                     scattering.clear();
                     Bukkit.getOnlinePlayers().forEach(p -> p.showTitle(Title.title(plugin.utils.chat("&b¡La partida ha empezado!"), plugin.utils.chat("&cBuena suerte"))));
+
+                    plugin.started = true;
+                    time();
+
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        World world = Bukkit.getWorld("world");
+                        assert world != null;
+                        world.setPVP(true);
+                        plugin.utils.broadcast("&8[&3HG&8] &cEl PvP ha sido activado. Buena suerte.", Sound.ENTITY_WITHER_SPAWN);
+                    }, 600);
 
                     cancel();
                     return;
@@ -157,5 +167,30 @@ public class Scatter implements Listener {
             new Location(Bukkit.getWorld("world"), 7.5, 73, -10.5),
             new Location(Bukkit.getWorld("world"), 10.5, 73, -7.5)
     );
+
+    public void time() {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            int min = 0;
+            int sec = 0;
+            int hor = 0;
+
+            @Override
+            public void run() {
+                if (!plugin.finalized) {
+                    sec++;
+                    if (sec == 60) {
+                        sec = 0;
+                        min++;
+                    }
+                    if (min == 60) {
+                        min = 0;
+                        hor++;
+                    }
+
+                    plugin.timer = String.format("%02d:%02d:%02d", hor, min, sec);
+                }
+            }
+        }, 0L, 20L);
+    }
 
 }

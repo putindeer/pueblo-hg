@@ -1,6 +1,7 @@
 package me.putindeer.puebloHG.utils;
 
 import me.putindeer.puebloHG.Main;
+import me.putindeer.puebloHG.commands.Restock;
 import me.putindeer.puebloHG.commands.Start;
 import me.putindeer.puebloHG.events.HGEvents;
 import org.bukkit.Bukkit;
@@ -44,6 +45,7 @@ public class StartThings {
     }
 
     public void registerCommands() {
+        new Restock(plugin);
         new Start(plugin);
     }
 

@@ -10,3 +10,6 @@ commands:
   start:
     description: Inicia una partida de Hunger Games
     permission: hg.admin
+  restock:
+    description: Rellena los cofres del Hunger Games
+    permission: hg.admin
