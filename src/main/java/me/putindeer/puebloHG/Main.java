@@ -14,6 +14,7 @@ import java.util.*;
 public final class Main extends JavaPlugin {
     @Getter
     public static Main pl;
+    public int totalPlayers = -1;
     public Utils utils;
     public GameManager gameManager;
     public PointsManager pointsManager;

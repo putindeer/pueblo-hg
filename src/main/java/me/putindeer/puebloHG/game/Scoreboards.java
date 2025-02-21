@@ -18,7 +18,13 @@ public class Scoreboards {
 
         List<Component> lines = new ArrayList<>();
         lines.add(headfooter);
-        lines.add(plugin.utils.chat("Players: &3" + playingCount()));
+
+        if (plugin.totalPlayers != -1) {
+            lines.add(plugin.utils.chat("Players: &3" + playingCount() + "&f/&3" + plugin.totalPlayers));
+        } else {
+            lines.add(plugin.utils.chat("Players: &3" + playingCount()));
+        }
+
         boolean hasTimers = false;
 
         if (plugin.gameManager.started) {

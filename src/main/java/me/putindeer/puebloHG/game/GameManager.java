@@ -179,6 +179,7 @@ public class GameManager implements Listener {
         plugin.alivePlayers.clear();
         plugin.deadPlayers.clear();
         plugin.scatter.scatter = false;
+        plugin.totalPlayers = 0;
         started = false;
         finalized = false;
         plugin.scatter.timeLeft = 30 * 60;

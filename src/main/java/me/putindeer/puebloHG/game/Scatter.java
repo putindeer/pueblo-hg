@@ -94,6 +94,7 @@ public class Scatter implements Listener {
             @Override
             public void run() {
                 if (counter[0] <= 0) {
+                    plugin.totalPlayers = scattering.size();
                     scattering.clear();
                     Bukkit.getOnlinePlayers().forEach(p -> p.showTitle(Title.title(plugin.utils.chat("&b¡La partida ha empezado!"), plugin.utils.chat("&cBuena suerte"))));
                     plugin.getServer().getOnlinePlayers().forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 600, 9)));
