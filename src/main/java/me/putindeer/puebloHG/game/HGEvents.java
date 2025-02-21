@@ -1,4 +1,4 @@
-package me.putindeer.puebloHG.events;
+package me.putindeer.puebloHG.game;
 
 import com.destroystokyo.paper.event.block.AnvilDamagedEvent;
 import fr.mrmicky.fastboard.adventure.FastBoard;
@@ -16,6 +16,7 @@ import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
 
@@ -163,6 +164,19 @@ public class HGEvents implements Listener {
         if (!(event.getDamager() instanceof Player p)) return;
         if (p.getGameMode() != GameMode.SURVIVAL) return;
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onSnowballHit(ProjectileHitEvent event) {
+        if (event.getEntity() instanceof Snowball snowball) {
+            if (event.getHitEntity() instanceof Player player) {
+                player.damage(0.0000001);
+                player.getWorld().playSound(player.getLocation(), "minecraft:entity.player.hurt", 1.0f, 1.0f);
+                Vector knockback = snowball.getVelocity().normalize().multiply(0.8);
+                knockback.setY(0.4);
+                player.setVelocity(knockback);
+            }
+        }
     }
 
     @EventHandler

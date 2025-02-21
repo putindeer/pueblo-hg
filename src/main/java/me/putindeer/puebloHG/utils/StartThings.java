@@ -3,22 +3,19 @@ package me.putindeer.puebloHG.utils;
 import me.putindeer.puebloHG.Main;
 import me.putindeer.puebloHG.commands.Restock;
 import me.putindeer.puebloHG.commands.Start;
-import me.putindeer.puebloHG.events.HGEvents;
+import me.putindeer.puebloHG.game.HGEvents;
+import me.putindeer.puebloHG.game.Scoreboards;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.*;
 
 import java.text.DecimalFormat;
+import java.util.Objects;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
 public class StartThings {
     private final Main plugin;
 
@@ -31,7 +28,11 @@ public class StartThings {
         registerCommands();
         registerListeners();
         if (!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdir();
+            if (plugin.getDataFolder().mkdir()) {
+                plugin.getLogger().info("Directorio del plugin creado con éxito.");
+            } else {
+                plugin.getLogger().warning("No se pudo crear el directorio del plugin.");
+            }
         }
 
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> plugin.boards.values().forEach(Scoreboards::updateBoard), 0, 20);
@@ -57,21 +58,19 @@ public class StartThings {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 
         if (scoreboard.getObjective("HealthTabPL") == null) {
-            scoreboard.registerNewObjective("HealthTabPL", "Dummy").setDisplayName(ChatColor.YELLOW + "");
-            scoreboard.getObjective("HealthTabPL").setDisplaySlot(DisplaySlot.PLAYER_LIST);
+            scoreboard.registerNewObjective("HealthTabPL", Criteria.DUMMY, plugin.utils.chat("&e")).setDisplaySlot(DisplaySlot.PLAYER_LIST);
         }
 
         if (scoreboard.getObjective("HealthNamePL") == null) {
-            scoreboard.registerNewObjective("HealthNamePL", "Dummy").setDisplayName(ChatColor.RED + "❤");
-            scoreboard.getObjective("HealthNamePL").setDisplaySlot(DisplaySlot.BELOW_NAME);
+            scoreboard.registerNewObjective("HealthNamePL", Criteria.DUMMY, plugin.utils.chat("&c❤")).setDisplaySlot(DisplaySlot.BELOW_NAME);
         }
 
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                 Objective objective = scoreboard.getObjective("HealthTabPL");
                 Objective objective2 = scoreboard.getObjective("HealthNamePL");
-                Score score1 = objective.getScore(player.getName());
-                Score score2 = objective2.getScore(player.getName());
+                Score score1 = Objects.requireNonNull(objective).getScore(player.getName());
+                Score score2 = Objects.requireNonNull(objective2).getScore(player.getName());
                 double totalhealth = player.getHealth() + player.getAbsorptionAmount();
                 score1.setScore((int) Math.floor((totalhealth / 20) * 100));
                 score2.setScore((int) Math.floor((totalhealth / 20) * 100));

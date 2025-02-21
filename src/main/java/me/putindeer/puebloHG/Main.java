@@ -2,7 +2,7 @@ package me.putindeer.puebloHG;
 
 import fr.mrmicky.fastboard.adventure.FastBoard;
 import lombok.Getter;
-import me.putindeer.puebloHG.managers.Scatter;
+import me.putindeer.puebloHG.game.Scatter;
 import me.putindeer.puebloHG.utils.StartThings;
 import me.putindeer.puebloHG.utils.Utils;
 import org.bukkit.plugin.java.JavaPlugin;

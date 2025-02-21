@@ -1,4 +1,4 @@
-package me.putindeer.puebloHG.managers;
+package me.putindeer.puebloHG.game;
 
 import lombok.Getter;
 import me.putindeer.puebloHG.Main;
@@ -9,16 +9,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static me.putindeer.puebloHG.commands.Restock.restock;
 
 public class Scatter implements Listener {
     private final Main plugin;
     List<Player> scattering = new ArrayList<>();
     @Getter
     public boolean scatter = false;
+    @Getter
+    public int timeLeft;
 
     public Scatter(Main plugin) {
         this.plugin = plugin;
@@ -84,17 +90,13 @@ public class Scatter implements Listener {
                     Main.alivePlayers = scattering.stream().map(Player::getName).collect(Collectors.toSet());
                     scattering.clear();
                     Bukkit.getOnlinePlayers().forEach(p -> p.showTitle(Title.title(plugin.utils.chat("&b¡La partida ha empezado!"), plugin.utils.chat("&cBuena suerte"))));
+                    plugin.getServer().getOnlinePlayers().forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 600, 9)));
 
                     plugin.started = true;
+                    Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(800);
                     time();
 
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        World world = Bukkit.getWorld("world");
-                        assert world != null;
-                        world.setPVP(true);
-                        plugin.utils.broadcast("&8[&3HG&8] &cEl PvP ha sido activado. Buena suerte.", Sound.ENTITY_WITHER_SPAWN);
-                    }, 600);
-
+                    startTimers();
                     cancel();
                     return;
                 }
@@ -117,7 +119,7 @@ public class Scatter implements Listener {
         if (!e.hasExplicitlyChangedBlock()) return;
         Player p = e.getPlayer();
         if (!scattering.contains(p)) return;
-        p.sendActionBar(plugin.utils.chat("&cNo tienes permitido moverte aún. Espera al scatter."));
+        p.sendActionBar(plugin.utils.chat("&cNo tienes permitido moverte aún."));
         e.setCancelled(true);
     }
 
@@ -168,11 +170,62 @@ public class Scatter implements Listener {
             new Location(Bukkit.getWorld("world"), 10.5, 73, -7.5)
     );
 
+    public void startTimers() {
+        timeLeft = 30 * 60;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (timeLeft <= 0) {
+                    plugin.utils.broadcast("&8[&3HG&8] &4¡El mapa se ha cerrado completamente!");
+                    cancel();
+                    return;
+                }
+
+                int nextEventTime = 0;
+                if (timeLeft > 29 * 60 + 30) nextEventTime = 29 * 60 + 30;
+                else if (timeLeft > 15 * 60) nextEventTime = 15 * 60;
+                else if (timeLeft > 10 * 60) nextEventTime = 10 * 60;
+                else if (timeLeft > 5 * 60) nextEventTime = 5 * 60;
+
+                int timeUntilNextEvent = timeLeft - nextEventTime;
+
+                switch (timeLeft) {
+                    case 29 * 60 + 30 -> {
+                        World world = Bukkit.getWorld("world");
+                        assert world != null;
+                        world.setPVP(true);
+                        plugin.utils.broadcast("&8[&3HG&8] &cEl PvP ha sido activado. Buena suerte.", Sound.ENTITY_WITHER_SPAWN);
+                    }
+                    case 15 * 60 -> {
+                        plugin.utils.broadcast("&8[&3HG&8] &eEl borde del mundo se empezó a reducir. Se reducirá completamente en 15 minutos.");
+                        Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(74, 900);
+                    }
+                    case 10 * 60 -> {
+                        plugin.utils.broadcast("&8[&3HG&8] &6¡Los cofres han sido reabastecidos!");
+                        restock();
+                    }
+                    case 5 * 60 -> {
+                        plugin.utils.broadcast("&8[&3HG&8] &dEl borde ahora se cerrará verticalmente.");
+                    }
+                }
+
+                int minutes = timeUntilNextEvent / 60;
+                int seconds = timeUntilNextEvent % 60;
+                String formattedTime = String.format("%02d:%02d", minutes, seconds);
+
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    player.sendActionBar(plugin.utils.chat("&ePróximo evento en: &c" + formattedTime));
+                }
+
+                timeLeft--;
+            }
+        }.runTaskTimer(plugin, 0L, 20L);
+    }
+
     public void time() {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             int min = 0;
             int sec = 0;
-            int hor = 0;
 
             @Override
             public void run() {
@@ -182,15 +235,10 @@ public class Scatter implements Listener {
                         sec = 0;
                         min++;
                     }
-                    if (min == 60) {
-                        min = 0;
-                        hor++;
-                    }
 
-                    plugin.timer = String.format("%02d:%02d:%02d", hor, min, sec);
+                    plugin.timer = String.format("%02d:%02d", min, sec);
                 }
             }
         }, 0L, 20L);
     }
-
 }
