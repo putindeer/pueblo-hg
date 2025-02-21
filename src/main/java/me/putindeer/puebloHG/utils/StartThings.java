@@ -1,10 +1,11 @@
 package me.putindeer.puebloHG.utils;
 
 import me.putindeer.puebloHG.Main;
+import me.putindeer.puebloHG.commands.ForceEnd;
+import me.putindeer.puebloHG.commands.RegisterChests;
 import me.putindeer.puebloHG.commands.Restock;
 import me.putindeer.puebloHG.commands.Start;
-import me.putindeer.puebloHG.game.HGEvents;
-import me.putindeer.puebloHG.game.Scoreboards;
+import me.putindeer.puebloHG.game.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -25,8 +26,16 @@ public class StartThings {
     }
 
     public void enable() {
+        createDataFolder();
+
         registerCommands();
-        registerListeners();
+        registerGameHandlers();
+        registerTabAndScoreboard();
+        registerHealthIndicators();
+        registerRecipes();
+    }
+
+    public void createDataFolder() {
         if (!plugin.getDataFolder().exists()) {
             if (plugin.getDataFolder().mkdir()) {
                 plugin.getLogger().info("Directorio del plugin creado con éxito.");
@@ -34,27 +43,33 @@ public class StartThings {
                 plugin.getLogger().warning("No se pudo crear el directorio del plugin.");
             }
         }
+        this.plugin.saveResource("config.yml", false);
+    }
 
+
+    public void registerCommands() {
+        new ForceEnd(plugin);
+        new RegisterChests(plugin);
+        new Restock(plugin);
+        new Start(plugin);
+    }
+
+    public void registerGameHandlers() {
+        new GameEvents(plugin);
+        plugin.gameManager = new GameManager(plugin);
+        plugin.pointsManager = new PointsManager(plugin);
+        plugin.scatter = new Scatter(plugin);
+    }
+
+    public void registerTabAndScoreboard() {
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> plugin.boards.values().forEach(Scoreboards::updateBoard), 0, 20);
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> Bukkit.getOnlinePlayers().forEach(p -> p.sendPlayerListHeaderAndFooter(
                 plugin.utils.chat("&3&lVenezuela Games"),
                 plugin.utils.chat("&7Ping: &3" + p.getPing() + " &8| &7Tps: &3" + new DecimalFormat("##").format(plugin.getServer().getTPS()[0]))
         )),0, 100);
-
-        registerScoreboard();
-        registerRecipes();
     }
 
-    public void registerCommands() {
-        new Restock(plugin);
-        new Start(plugin);
-    }
-
-    public void registerListeners() {
-        new HGEvents(plugin);
-    }
-
-    public void registerScoreboard() {
+    public void registerHealthIndicators() {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 
         if (scoreboard.getObjective("HealthTabPL") == null) {

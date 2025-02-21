@@ -15,15 +15,14 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
 
-public class HGEvents implements Listener {
+public class GameEvents implements Listener {
     private final Main plugin;
 
-    public HGEvents(Main plugin) {
+    public GameEvents(Main plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
@@ -41,9 +40,16 @@ public class HGEvents implements Listener {
                 plugin.utils.chat("&7Ping: &3" + p.getPing() + " &8| &7Tps: &3" + new DecimalFormat("##").format(plugin.getServer().getTPS()[0])));
 
         if (p.getGameMode() == GameMode.SURVIVAL) {
-            Location loc = new Location(Bukkit.getWorld("world"), -999.5, 100, 1000.5);
-            p.teleport(loc);
-            restorePlayer(p);
+            if (!plugin.gameManager.started && !plugin.scatter.isScatter()) {
+                Location loc = new Location(Bukkit.getWorld("world"), -999.5, 100, 1000.5);
+                p.teleport(loc);
+                p.setGameMode(GameMode.SURVIVAL);
+                plugin.utils.restorePlayer(p);
+            } else if (!plugin.alivePlayers.contains(p.getUniqueId())){
+                p.teleport(new Location(p.getWorld(), 0, 94, 11));
+                p.setGameMode(GameMode.SPECTATOR);
+                p.setStatistic(Statistic.PLAYER_KILLS, 0);
+            }
         }
     }
 
@@ -57,23 +63,24 @@ public class HGEvents implements Listener {
         }
     }
 
-    private void restorePlayer(Player p) {
-        p.getInventory().clear();
-        plugin.utils.setMaxHealth(p);
-        p.setFoodLevel(20);
-        p.setSaturation(5.0f);
-        p.getActivePotionEffects().forEach(potionEffect -> p.removePotionEffect(potionEffect.getType()));
-        p.setLevel(0);
-        p.setExp(0.0f);
-        p.setFireTicks(0);
-        p.setItemOnCursor(new ItemStack(Material.AIR));
-        p.setInvulnerable(false);
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player p) {
+            if (p.getGameMode().equals(GameMode.CREATIVE)) return;
+            if (plugin.gameManager.started && !plugin.gameManager.finalized) return;
+
+            event.setCancelled(true);
+        }
     }
 
-    private void deleteItems(World world) {
-        world.getEntities().stream()
-                .filter(entity -> entity instanceof Item || entity instanceof Arrow || entity instanceof SpectralArrow)
-                .forEach(Entity::remove);
+    @EventHandler
+    public void onFoodLevelChange(FoodLevelChangeEvent event) {
+        if (event.getEntity() instanceof Player p) {
+            if (p.getGameMode().equals(GameMode.CREATIVE)) return;
+            if (plugin.gameManager.started && !plugin.gameManager.finalized) return;
+
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -190,16 +197,6 @@ public class HGEvents implements Listener {
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         if (event.getBlock().getType() == Material.DECORATED_POT) {
             event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        event.setShouldDropExperience(false);
-        if (plugin.started) {
-            Player p = event.getPlayer();
-            p.teleport(new Location(p.getWorld(), 0, 94, 11));
-            p.setGameMode(GameMode.SPECTATOR);
         }
     }
 }

@@ -7,7 +7,6 @@ import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,6 +14,7 @@ import java.util.*;
 
 public class Restock implements CommandExecutor {
     private final Main plugin;
+    public static Set<Location> locations = new HashSet<>();
 
     public Restock(Main plugin) {
         this.plugin = plugin;
@@ -23,39 +23,28 @@ public class Restock implements CommandExecutor {
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         restock();
-        plugin.utils.message(sender, "&8[&3HG&8] &7Los cofres han sido reemplazados con la LootTable personalizada.");
+        plugin.utils.message(sender, "&7Los cofres han sido reemplazados con la LootTable personalizada.");
         return true;
     }
 
     public static void restock() {
-        int centerX = 0;
-        int centerZ = 0;
-        World world = Bukkit.getWorld("world");
         Random random = new Random();
+        for (Location loc : locations) {
+            Block block = loc.getBlock();
+            if (block.getType() == Material.CHEST) {
+                block.setType(Material.AIR);
+                block.setType(Material.CHEST);
 
-        int minY = 55;
-        int maxY = 85;
+                Chest chest = (Chest) block.getState();
+                LootTable lootTable = getRandomLootTable(random);
+                assert lootTable != null;
 
-        for (int x = -400; x <= 400; x++) {
-            for (int z = -400; z <= 400; z++) {
-                for (int y = minY; y <= maxY; y++) {
-                    Location loc = new Location(world, centerX + x, y, centerZ + z);
-                    Block block = loc.getBlock();
-
-                    if (block.getType() == Material.CHEST) {
-                        Chest chest = (Chest) block.getState();
-
-                        LootTable lootTable = getRandomLootTable(random);
-                        Inventory chestInventory = chest.getInventory();
-                        assert lootTable != null;
-                        chestInventory.clear();
-                        chest.setLootTable(lootTable);
-                        chest.update();
-                    }
-                }
+                chest.setLootTable(lootTable);
+                chest.update();
             }
         }
     }
+
 
     private static LootTable getRandomLootTable(Random random) {
         int chance = random.nextInt(100);

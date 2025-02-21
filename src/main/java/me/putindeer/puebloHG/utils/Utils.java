@@ -1,14 +1,15 @@
 package me.putindeer.puebloHG.utils;
 
 import lombok.NoArgsConstructor;
+import me.putindeer.puebloHG.Main;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.Bukkit;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -19,7 +20,7 @@ public class Utils {
     /**
      * Prefix del plugin
      */
-    public final Component prefix = Component.empty();
+    public final Component prefix = chat("&8[&3HG&8] &f");
 
     /**
      * Convierte un texto con códigos HEX a un 'Component'
@@ -78,6 +79,17 @@ public class Utils {
             p.playSound(p.getLocation(), s, 10, 1);
         }
         Bukkit.getConsoleSender().sendMessage(prefix.append(chat(c)));
+    }
+
+    /**
+     * Envia un mensaje a todos los jugadores del servidor sin prefix
+     * @param c El texto, como 'String'
+     */
+    public void broadcastNoPrefix(String c) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.sendMessage(chat(c));
+        }
+        Bukkit.getConsoleSender().sendMessage(chat(c));
     }
 
     /**
@@ -159,5 +171,37 @@ public class Utils {
      */
     public void setMaxHealth(Player p) {
         p.setHealth(Objects.requireNonNull(p.getAttribute(Attribute.MAX_HEALTH)).getDefaultValue());
+    }
+
+    /**
+     * Restaura completamente a un jugador
+     * @param p El jugador a restaurar
+     */
+    public void restorePlayer(Player p) {
+        p.getInventory().clear();
+        setMaxHealth(p);
+        p.setFoodLevel(20);
+        p.setSaturation(5.0f);
+        p.getActivePotionEffects().forEach(potionEffect -> p.removePotionEffect(potionEffect.getType()));
+        p.setLevel(0);
+        p.setExp(0.0f);
+        p.setFireTicks(0);
+        p.setItemOnCursor(new ItemStack(Material.AIR));
+        p.setInvulnerable(false);
+        p.setGameMode(GameMode.SURVIVAL);
+        p.setStatistic(Statistic.PLAYER_KILLS, 0);
+    }
+
+    /**
+     * Ejecuta una tarea ({@link Runnable}) después de un tiempo especificado.
+     * @param delay El tiempo de espera en ticks antes de ejecutar.
+     * @param run La tarea a ejecutar, implementada como un {@code Runnable}.
+     */
+    public void delay(int delay, Runnable run) {
+        Bukkit.getScheduler().runTaskLater(Main.getPl(), run,delay);
+    }
+
+    public void delay(Runnable run) {
+        delay(1, run);
     }
 }

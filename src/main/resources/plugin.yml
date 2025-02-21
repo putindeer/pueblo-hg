@@ -13,3 +13,9 @@ commands:
   restock:
     description: Rellena los cofres del Hunger Games
     permission: hg.admin
+  forceend:
+    description: Fuerza el final de la partida
+    permission: hg.admin
+  registerchests:
+    description: Guarda los cofres del mapa
+    permission: hg.admin

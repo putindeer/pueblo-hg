@@ -2,6 +2,8 @@ package me.putindeer.puebloHG;
 
 import fr.mrmicky.fastboard.adventure.FastBoard;
 import lombok.Getter;
+import me.putindeer.puebloHG.game.GameManager;
+import me.putindeer.puebloHG.game.PointsManager;
 import me.putindeer.puebloHG.game.Scatter;
 import me.putindeer.puebloHG.utils.StartThings;
 import me.putindeer.puebloHG.utils.Utils;
@@ -13,23 +15,23 @@ public final class Main extends JavaPlugin {
     @Getter
     public static Main pl;
     public Utils utils;
+    public GameManager gameManager;
+    public PointsManager pointsManager;
     public Scatter scatter;
-    public static Set<String> alivePlayers = new HashSet<>();
+    public Set<UUID> alivePlayers = new HashSet<>();
+    public List<UUID> deadPlayers = new ArrayList<>();
     public Map<UUID, FastBoard> boards = new HashMap<>();
     public String timer = "";
-    public boolean started = false;
-    public boolean finalized = false;
 
     @Override
     public void onEnable() {
         pl = this;
         utils = new Utils();
-        scatter = new Scatter(this);
         new StartThings(this);
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        pointsManager.save();
     }
 }

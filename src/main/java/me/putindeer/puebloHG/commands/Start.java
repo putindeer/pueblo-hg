@@ -19,7 +19,7 @@ public class Start implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, String @NotNull [] strings) {
         if (plugin.scatter.isScatter()) {
-            plugin.utils.message(sender, "&8[&3HG&8] &7La partida ya ha iniciado.");
+            plugin.utils.message(sender, "&7La partida ya ha iniciado.");
             return false;
         }
         plugin.scatter.scatter();
