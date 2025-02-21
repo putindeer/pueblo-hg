@@ -67,8 +67,11 @@ public class GameManager implements Listener {
             plugin.scatter.eventTimer.cancel();
             plugin.scatter.eventTimer = null;
         }
-
-        Player winner = Bukkit.getPlayer(plugin.alivePlayers.iterator().next());
+        Player w = null;
+        if (!plugin.alivePlayers.isEmpty()){
+            w = Bukkit.getPlayer(plugin.alivePlayers.iterator().next());
+        }
+        final Player winner = w;
 
         handleWinner(winner);
         handleSecondPlace();
