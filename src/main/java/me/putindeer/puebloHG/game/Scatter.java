@@ -23,7 +23,7 @@ public class Scatter implements Listener {
     private final Main plugin;
     public BukkitTask eventTimer;
     public int gameTimer;
-    List<Player> scattering = new ArrayList<>();
+    public final List<Player> scattering = new ArrayList<>();
     @Getter
     public boolean scatter = false;
     @Getter
@@ -76,12 +76,9 @@ public class Scatter implements Listener {
                 } else {start(); cancel();}
             }
         }.runTaskTimer(plugin, 0L, 5L);
-
     }
 
-
-
-    public void start() {
+    private void start() {
         plugin.utils.broadcast("&7El TP ha terminado. La partida comenzará en 10 segundos.");
         String[] colors = {
                 "&#00FF00", "&#1CE300", "&#39C600", "&#55AA00", "&#718E00",
@@ -101,8 +98,8 @@ public class Scatter implements Listener {
 
                     plugin.gameManager.started = true;
                     Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(800);
-                    time();
 
+                    time();
                     startTimers();
                     cancel();
                     return;
@@ -121,6 +118,18 @@ public class Scatter implements Listener {
         }.runTaskTimer(plugin, 0L, 20L);
     }
 
+    public void stop() {
+        if (gameTimer != -1) {
+            Bukkit.getScheduler().cancelTask(gameTimer);
+            gameTimer = -1;
+        }
+
+        if (eventTimer != null) {
+            eventTimer.cancel();
+            eventTimer = null;
+        }
+    }
+
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if (!e.hasExplicitlyChangedBlock()) return;
@@ -130,7 +139,7 @@ public class Scatter implements Listener {
         e.setCancelled(true);
     }
 
-    List<Location> locations = Arrays.asList(
+    public final List<Location> locations = Arrays.asList(
             new Location(Bukkit.getWorld("world"), 12.5, 73, 13.5),
             new Location(Bukkit.getWorld("world"), 8.5, 73, 15.5),
             new Location(Bukkit.getWorld("world"), 3.5, 73, 17.5),
@@ -177,19 +186,20 @@ public class Scatter implements Listener {
             new Location(Bukkit.getWorld("world"), 10.5, 73, -7.5)
     );
 
-    public void startTimers() {
-        timeLeft = 30 * 60;
+    private void startTimers() {
+        timeLeft = 25 * 60;
         eventTimer = new BukkitRunnable() {
             @Override
             public void run() {
                 if (timeLeft <= 0) {
                     plugin.utils.broadcast("&4¡El mapa se ha cerrado completamente!");
                     cancel();
+                    eventTimer = null;
                     return;
                 }
 
                 int nextEventTime = 0;
-                if (timeLeft > 29 * 60 + 30) nextEventTime = 29 * 60 + 30;
+                if (timeLeft > 24 * 60 + 30) nextEventTime = 24 * 60 + 30;
                 else if (timeLeft > 15 * 60) nextEventTime = 15 * 60;
                 else if (timeLeft > 10 * 60) nextEventTime = 10 * 60;
                 else if (timeLeft > 5 * 60) nextEventTime = 5 * 60;
@@ -197,7 +207,7 @@ public class Scatter implements Listener {
                 int timeUntilNextEvent = timeLeft - nextEventTime;
 
                 switch (timeLeft) {
-                    case 29 * 60 + 30 -> {
+                    case 24 * 60 + 30 -> {
                         World world = Bukkit.getWorld("world");
                         assert world != null;
                         world.setPVP(true);
@@ -213,6 +223,7 @@ public class Scatter implements Listener {
                     }
                     case 5 * 60 -> {
                         plugin.utils.broadcast("&dEl borde ahora se cerrará verticalmente.");
+                        plugin.verticalBorder.start();
                     }
                 }
 
@@ -229,7 +240,7 @@ public class Scatter implements Listener {
         }.runTaskTimer(plugin, 0L, 20L);
     }
 
-    public void time() {
+    private void time() {
         gameTimer = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             int min = 0;
             int sec = 0;

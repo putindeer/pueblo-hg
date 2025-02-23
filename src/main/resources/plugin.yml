@@ -5,6 +5,8 @@ api-version: '1.21'
 author: putindeer
 description: Hunger Games Plugin
 website: github.com/putindeer
+softdepend:
+  - PlaceholderAPI
 
 commands:
   start:
@@ -19,3 +21,13 @@ commands:
   registerchests:
     description: Guarda los cofres del mapa
     permission: hg.admin
+  leaderboard:
+    description: Muestra el top 5 del tablero de puntos del evento
+    aliases:
+      - lb
+      - toppoints
+  fullleaderboard:
+    description: Muestra el top completo del tablero de puntos del evento
+    aliases:
+      - fulllb
+      - fulltoppoints

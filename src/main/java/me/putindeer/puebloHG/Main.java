@@ -5,6 +5,7 @@ import lombok.Getter;
 import me.putindeer.puebloHG.game.GameManager;
 import me.putindeer.puebloHG.game.PointsManager;
 import me.putindeer.puebloHG.game.Scatter;
+import me.putindeer.puebloHG.game.VerticalBorder;
 import me.putindeer.puebloHG.utils.StartThings;
 import me.putindeer.puebloHG.utils.Utils;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,9 +20,10 @@ public final class Main extends JavaPlugin {
     public GameManager gameManager;
     public PointsManager pointsManager;
     public Scatter scatter;
-    public Set<UUID> alivePlayers = new HashSet<>();
-    public List<UUID> deadPlayers = new ArrayList<>();
-    public Map<UUID, FastBoard> boards = new HashMap<>();
+    public VerticalBorder verticalBorder;
+    public final Set<UUID> alivePlayers = new HashSet<>();
+    public final List<UUID> deadPlayers = new ArrayList<>();
+    public final Map<UUID, FastBoard> boards = new HashMap<>();
     public String timer = "";
 
     @Override

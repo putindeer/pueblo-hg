@@ -7,6 +7,8 @@ import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +16,7 @@ import java.util.*;
 
 public class Restock implements CommandExecutor {
     private final Main plugin;
-    public static Set<Location> locations = new HashSet<>();
+    public static final Set<Location> locations = new HashSet<>();
 
     public Restock(Main plugin) {
         this.plugin = plugin;
@@ -23,7 +25,7 @@ public class Restock implements CommandExecutor {
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         restock();
-        plugin.utils.message(sender, "&7Los cofres han sido reemplazados con la LootTable personalizada.");
+        plugin.utils.message(sender, "&7Los cofres han sido rellenados de vuelta.");
         return true;
     }
 
@@ -31,20 +33,15 @@ public class Restock implements CommandExecutor {
         Random random = new Random();
         for (Location loc : locations) {
             Block block = loc.getBlock();
-            if (block.getType() == Material.CHEST) {
-                block.setType(Material.AIR);
-                block.setType(Material.CHEST);
+            Chest chest = (Chest) block.getState();
+            Inventory inv = chest.getInventory();
 
-                Chest chest = (Chest) block.getState();
-                LootTable lootTable = getRandomLootTable(random);
-                assert lootTable != null;
-
-                chest.setLootTable(lootTable);
-                chest.update();
-            }
+            LootTable lootTable = getRandomLootTable(random);
+            assert lootTable != null;
+            inv.clear();
+            lootTable.fillInventory(inv, random, new LootContext.Builder(loc).luck(1).lootedEntity(null).build());
         }
     }
-
 
     private static LootTable getRandomLootTable(Random random) {
         int chance = random.nextInt(100);

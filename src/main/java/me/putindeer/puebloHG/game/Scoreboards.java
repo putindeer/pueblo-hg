@@ -20,9 +20,9 @@ public class Scoreboards {
         lines.add(headfooter);
 
         if (plugin.totalPlayers != -1) {
-            lines.add(plugin.utils.chat("Players: &3" + playingCount() + "&f/&3" + plugin.totalPlayers));
+            lines.add(plugin.utils.chat("Jugadores: &3" + playingCount() + "&f/&3" + plugin.totalPlayers));
         } else {
-            lines.add(plugin.utils.chat("Players: &3" + playingCount()));
+            lines.add(plugin.utils.chat("Jugadores: &3" + playingCount()));
         }
 
         boolean hasTimers = false;
@@ -31,7 +31,7 @@ public class Scoreboards {
             lines.add(plugin.utils.chat("Tiempo de partida: &3" + plugin.timer));
             lines.add(Component.empty());
 
-            int pvpTime = Math.max(plugin.scatter.timeLeft - (29 * 60 + 30), 0);
+            int pvpTime = Math.max(plugin.scatter.timeLeft - (24 * 60 + 30), 0);
             int borderTime = Math.max(plugin.scatter.timeLeft - (15 * 60), 0);
             int restockTime = Math.max(plugin.scatter.timeLeft - (10 * 60), 0);
             int verticalBorderTime = Math.max(plugin.scatter.timeLeft - (5 * 60), 0);
@@ -54,6 +54,7 @@ public class Scoreboards {
             lines.add(Component.empty());
         } else {
             lines.add(Component.empty());
+            lines.add(plugin.utils.chat("Puntos: &3" + plugin.pointsManager.getPoints(board.getPlayer().getUniqueId())));
         }
 
         lines.add(plugin.utils.chat("Ping: &3" + board.getPlayer().getPing()));

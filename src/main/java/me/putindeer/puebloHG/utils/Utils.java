@@ -83,9 +83,15 @@ public class Utils {
 
     /**
      * Envia un mensaje a todos los jugadores del servidor sin prefix
-     * @param c El texto, como 'String'
+     * @param c El texto que quieres mostrar, como 'String' o 'Component'
      */
     public void broadcastNoPrefix(String c) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.sendMessage(chat(c));
+        }
+        Bukkit.getConsoleSender().sendMessage(chat(c));
+    }
+    public void broadcastNoPrefix(Component c) {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.sendMessage(chat(c));
         }
@@ -190,6 +196,7 @@ public class Utils {
         p.setInvulnerable(false);
         p.setGameMode(GameMode.SURVIVAL);
         p.setStatistic(Statistic.PLAYER_KILLS, 0);
+        p.setWorldBorder(p.getWorld().getWorldBorder());
     }
 
     /**

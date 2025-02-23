@@ -39,7 +39,7 @@ public class GameEvents implements Listener {
                 plugin.utils.chat("&3&lVenezuela Games"),
                 plugin.utils.chat("&7Ping: &3" + p.getPing() + " &8| &7Tps: &3" + new DecimalFormat("##").format(plugin.getServer().getTPS()[0])));
 
-        if (p.getGameMode() == GameMode.SURVIVAL) {
+        if (p.getGameMode() != GameMode.CREATIVE) {
             if (!plugin.gameManager.started && !plugin.scatter.isScatter()) {
                 Location loc = new Location(Bukkit.getWorld("world"), -999.5, 100, 1000.5);
                 p.teleport(loc);
@@ -49,6 +49,7 @@ public class GameEvents implements Listener {
                 p.teleport(new Location(p.getWorld(), 0, 94, 11));
                 p.setGameMode(GameMode.SPECTATOR);
                 p.setStatistic(Statistic.PLAYER_KILLS, 0);
+                plugin.utils.restorePlayer(p);
             }
         }
     }

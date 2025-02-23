@@ -1,10 +1,7 @@
 package me.putindeer.puebloHG.utils;
 
 import me.putindeer.puebloHG.Main;
-import me.putindeer.puebloHG.commands.ForceEnd;
-import me.putindeer.puebloHG.commands.RegisterChests;
-import me.putindeer.puebloHG.commands.Restock;
-import me.putindeer.puebloHG.commands.Start;
+import me.putindeer.puebloHG.commands.*;
 import me.putindeer.puebloHG.game.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -14,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.scoreboard.*;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
@@ -43,12 +41,15 @@ public class StartThings {
                 plugin.getLogger().warning("No se pudo crear el directorio del plugin.");
             }
         }
-        this.plugin.saveResource("config.yml", false);
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+        if (!configFile.exists()) {
+            plugin.saveResource("config.yml", false);
+        }
     }
-
 
     public void registerCommands() {
         new ForceEnd(plugin);
+        new Leaderboard(plugin);
         new RegisterChests(plugin);
         new Restock(plugin);
         new Start(plugin);
@@ -59,6 +60,8 @@ public class StartThings {
         plugin.gameManager = new GameManager(plugin);
         plugin.pointsManager = new PointsManager(plugin);
         plugin.scatter = new Scatter(plugin);
+        plugin.verticalBorder = new VerticalBorder(plugin);
+        new Placeholders().register();
     }
 
     public void registerTabAndScoreboard() {
@@ -72,8 +75,8 @@ public class StartThings {
     public void registerHealthIndicators() {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 
-        if (scoreboard.getObjective("HealthTabPL") == null) {
-            scoreboard.registerNewObjective("HealthTabPL", Criteria.DUMMY, plugin.utils.chat("&e")).setDisplaySlot(DisplaySlot.PLAYER_LIST);
+        if (scoreboard.getObjective("PointsTabPL") == null) {
+            scoreboard.registerNewObjective("PointsTabPL", Criteria.DUMMY, plugin.utils.chat("&e")).setDisplaySlot(DisplaySlot.PLAYER_LIST);
         }
 
         if (scoreboard.getObjective("HealthNamePL") == null) {
@@ -82,12 +85,12 @@ public class StartThings {
 
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                Objective objective = scoreboard.getObjective("HealthTabPL");
+                Objective objective = scoreboard.getObjective("PointsTabPL");
                 Objective objective2 = scoreboard.getObjective("HealthNamePL");
                 Score score1 = Objects.requireNonNull(objective).getScore(player.getName());
                 Score score2 = Objects.requireNonNull(objective2).getScore(player.getName());
                 double totalhealth = player.getHealth() + player.getAbsorptionAmount();
-                score1.setScore((int) Math.floor((totalhealth / 20) * 100));
+                score1.setScore(plugin.pointsManager.getPoints(player.getUniqueId()));
                 score2.setScore((int) Math.floor((totalhealth / 20) * 100));
             }
         },0,5);
@@ -107,8 +110,19 @@ public class StartThings {
         diamondSword3.shape("  D", "  D", "  S");
         diamondSword3.setIngredient('D', Material.DIAMOND);
         diamondSword3.setIngredient('S', Material.WOODEN_SWORD);
+        ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
+        ShapedRecipe diamondAxe1 = new ShapedRecipe(NamespacedKey.minecraft("diamond_stick_axe_left"), axe);
+        diamondAxe1.shape("DD ", "DS ", " S ");
+        diamondAxe1.setIngredient('D', Material.DIAMOND);
+        diamondAxe1.setIngredient('S', Material.WOODEN_SWORD);
+        ShapedRecipe diamondAxe2 = new ShapedRecipe(NamespacedKey.minecraft("diamond_stick_axe_right"), axe);
+        diamondAxe2.shape(" DD", " SD", " S ");
+        diamondAxe2.setIngredient('D', Material.DIAMOND);
+        diamondAxe2.setIngredient('S', Material.WOODEN_SWORD);
         Bukkit.addRecipe(diamondSword1);
         Bukkit.addRecipe(diamondSword2);
         Bukkit.addRecipe(diamondSword3);
+        Bukkit.addRecipe(diamondAxe1);
+        Bukkit.addRecipe(diamondAxe2);
     }
 }

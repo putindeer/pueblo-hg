@@ -13,16 +13,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import static me.putindeer.puebloHG.commands.Restock.restock;
 
 public class GameManager implements Listener {
     private final Main plugin;
@@ -58,15 +63,9 @@ public class GameManager implements Listener {
     public void endGame() {
         finalized = true;
 
-        if (plugin.scatter.gameTimer != -1) {
-            Bukkit.getScheduler().cancelTask(plugin.scatter.gameTimer);
-            plugin.scatter.gameTimer = -1;
-        }
+        plugin.scatter.stop();
+        plugin.verticalBorder.stop();
 
-        if (plugin.scatter.eventTimer != null) {
-            plugin.scatter.eventTimer.cancel();
-            plugin.scatter.eventTimer = null;
-        }
         Player w = null;
         if (!plugin.alivePlayers.isEmpty()){
             w = Bukkit.getPlayer(plugin.alivePlayers.iterator().next());
@@ -96,7 +95,7 @@ public class GameManager implements Listener {
                 }
 
                 if (countdown == 30) {
-                    plugin.utils.broadcast("&eLa partida se reiniciará en &630 segundos.");
+                    plugin.utils.broadcast("&eLa partida se reiniciará en &630 segundos&e.");
                 } else if (countdown <= 5) {
                     plugin.utils.broadcast("&cReiniciando en &4" + countdown + "...");
                 }
@@ -106,7 +105,7 @@ public class GameManager implements Listener {
         }.runTaskTimer(plugin, 0L, 20L);
     }
 
-    public void handleWinner(Player winner) {
+    private void handleWinner(Player winner) {
         if (winner != null) {
             plugin.pointsManager.addPoints(winner.getUniqueId(), winPoints);
             plugin.utils.message(winner, "&a+" + winPoints + " puntos por ganar.");
@@ -120,7 +119,7 @@ public class GameManager implements Listener {
         }
     }
 
-    public void handleSecondPlace() {
+    private void handleSecondPlace() {
         UUID secondPlace = getSecondPlace();
         if (secondPlace != null) {
             plugin.pointsManager.addPoints(secondPlace, secondPlacePoints);
@@ -141,7 +140,7 @@ public class GameManager implements Listener {
         return null;
     }
 
-    public void handleThirdPlace() {
+    private void handleThirdPlace() {
         UUID thirdPlace = getThirdPlace();
         if (thirdPlace != null) {
             plugin.pointsManager.addPoints(thirdPlace, thirdPlacePoints);
@@ -179,10 +178,11 @@ public class GameManager implements Listener {
         plugin.alivePlayers.clear();
         plugin.deadPlayers.clear();
         plugin.scatter.scatter = false;
-        plugin.totalPlayers = 0;
+        plugin.totalPlayers = -1;
         started = false;
         finalized = false;
-        plugin.scatter.timeLeft = 30 * 60;
+        plugin.scatter.timeLeft = 25 * 60;
+        restock();
     }
 
     private void deleteItems(World world) {
@@ -191,7 +191,7 @@ public class GameManager implements Listener {
                 .forEach(Entity::remove);
     }
 
-    public void resetDoors() {
+    private void resetDoors() {
         for (Location loc : doors) {
             Block block = loc.getBlock();
             if (block.getBlockData() instanceof Openable door) {
@@ -224,6 +224,7 @@ public class GameManager implements Listener {
     private void resetPlayerAfterDeath(Player p) {
         plugin.alivePlayers.remove(p.getUniqueId());
         plugin.deadPlayers.add(p.getUniqueId());
+        if (!p.isOnline()) return;
 
         Location loc = p.getLocation();
         p.setGameMode(GameMode.SPECTATOR);
@@ -285,7 +286,7 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onDoorInteract(PlayerInteractEvent event) {
-        if (!plugin.gameManager.started) return;
+        if (!started) return;
 
         Block block = event.getClickedBlock();
         if (block == null) return;
@@ -297,15 +298,17 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
+        if (!started) return;
         if (!event.hasExplicitlyChangedBlock()) return;
         Player player = event.getPlayer();
+        if (player.getGameMode() != GameMode.SURVIVAL) return;
         Location loc = player.getLocation();
         World world = loc.getWorld();
         if (world == null) return;
 
-        int radius = 12;
-        int centerX = 25;
-        int centerZ = 25;
+        int radius = 25;
+        int centerX = -1;
+        int centerZ = -1;
         boolean isInSafeZone = Math.abs(loc.getBlockX() - centerX) <= radius &&
                 Math.abs(loc.getBlockZ() - centerZ) <= radius;
 
@@ -320,5 +323,47 @@ public class GameManager implements Listener {
             }
         }
     }
-}
 
+    private final HashMap<UUID, Integer> remainingTime = new HashMap<>();
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        if (!started) return;
+        Player player = event.getPlayer();
+        if (!plugin.alivePlayers.contains(player.getUniqueId())) return;
+        UUID uuid = player.getUniqueId();
+
+        remainingTime.putIfAbsent(uuid, 60);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!remainingTime.containsKey(uuid)) {
+                    cancel();
+                    return;
+                }
+
+                int timeLeft = remainingTime.get(uuid) - 1;
+                remainingTime.put(uuid, timeLeft);
+
+                if (timeLeft <= 0) {
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        if (!Bukkit.getOfflinePlayer(uuid).isOnline()) {
+                            plugin.utils.broadcastNoPrefix(handleDeathMessage(Component.text(player.getName() + " murió por desconectarse."), player, null));
+                            resetPlayerAfterDeath(player);
+                            handlePoints(player, null);
+                            checkForWinner();
+                        }
+                        remainingTime.remove(uuid);
+                    });
+                    cancel();
+                }
+            }
+        }.runTaskTimerAsynchronously(plugin, 20L, 20L);
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        remainingTime.remove(event.getPlayer().getUniqueId());
+    }
+}
