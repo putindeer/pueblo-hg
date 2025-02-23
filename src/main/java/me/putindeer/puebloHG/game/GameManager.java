@@ -110,7 +110,7 @@ public class GameManager implements Listener {
         if (winner != null) {
             plugin.pointsManager.addPoints(winner.getUniqueId(), winPoints);
             plugin.utils.message(winner, "&a+" + winPoints + " puntos por ganar.");
-            plugin.utils.broadcast("&e¡" + winner.getName() + " ha ganado la partida!");
+            plugin.utils.broadcast("&e¡" + winner.getName() + " ha ganado la partida!", Sound.ENTITY_WITHER_DEATH);
             spawnFireworks(winner.getLocation());
             winner.showTitle(Title.title(
                     plugin.utils.chat("&a¡Has ganado la partida!"),
@@ -264,6 +264,9 @@ public class GameManager implements Listener {
             Player survivor = plugin.getServer().getPlayer(uuid);
             if (survivor == null) return;
 
+            survivor.playSound(survivor.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1);
+
+
             plugin.utils.message(survivor, "&a+" + survivePoints + " punto por sobrevivir.");
         });
     }
@@ -308,7 +311,6 @@ public class GameManager implements Listener {
             }
         }
     }
-
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {

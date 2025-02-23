@@ -197,7 +197,10 @@ public class Scatter implements Listener {
                     Bukkit.getOnlinePlayers().stream()
                             .filter(player -> player.getGameMode() == GameMode.SURVIVAL)
                             .filter(player -> plugin.alivePlayers.contains(player.getUniqueId()))
-                            .forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0)));
+                            .forEach(player -> {
+                                player.playSound(player.getLocation(), Sound.ENTITY_ALLAY_DEATH, 1.0f, 0.1f);
+                                player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0));
+                            });
                     cancel();
                     eventTimer = null;
                     return;
@@ -219,15 +222,15 @@ public class Scatter implements Listener {
                         plugin.utils.broadcast("&cEl PvP ha sido activado. Buena suerte.", Sound.ENTITY_WITHER_SPAWN);
                     }
                     case 15 * 60 -> {
-                        plugin.utils.broadcast("&eEl borde del mundo se empezó a reducir. Se reducirá completamente en 15 minutos.");
+                        plugin.utils.broadcast("&eEl borde del mundo se empezó a reducir. Se reducirá completamente en 15 minutos.", Sound.ENTITY_BLAZE_DEATH);
                         Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(74, 900);
                     }
                     case 10 * 60 -> {
-                        plugin.utils.broadcast("&6¡Los cofres han sido reabastecidos!");
+                        plugin.utils.broadcast("&6¡Los cofres han sido reabastecidos!", Sound.ENTITY_VILLAGER_WORK_FLETCHER);
                         restock();
                     }
                     case 5 * 60 -> {
-                        plugin.utils.broadcast("&dEl borde ahora se cerrará verticalmente.");
+                        plugin.utils.broadcast("&dEl borde ahora se cerrará verticalmente.", Sound.ENTITY_BLAZE_DEATH);
                         plugin.verticalBorder.start();
                     }
                 }
