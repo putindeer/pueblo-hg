@@ -54,8 +54,8 @@ public class RegisterChests implements CommandExecutor {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
         World world = Bukkit.getWorld("world");
-        int minY = 55;
-        int maxY = 85;
+        int minY = 30;
+        int maxY = 110;
 
         for (int x = -400; x <= 400; x++) {
             for (int z = -400; z <= 400; z++) {
