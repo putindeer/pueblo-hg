@@ -73,30 +73,14 @@ public class VerticalBorder {
         damageTask = new BukkitRunnable() {
             @Override
             public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    double y = player.getLocation().getY();
-                    World world = player.getWorld();
-                    WorldBorder realBorder = world.getWorldBorder();
-
-                    if (y < minY1 || y > maxY1) {
-                        player.damage(4.0);
-                    } else if ((y - minY1) <= 3 || (maxY1 - y) <= 3) {
-                        WorldBorder fakeBorder = Bukkit.createWorldBorder();
-                        fakeBorder.setCenter(realBorder.getCenter());
-                        fakeBorder.setDamageAmount(realBorder.getDamageAmount());
-                        fakeBorder.setDamageBuffer(realBorder.getDamageBuffer());
-                        fakeBorder.setSize(realBorder.getSize());
-                        if (shrinking) {
-                            fakeBorder.setSize(realBorder.getSize() - 0.001, 1);
-                        }
-                        fakeBorder.setWarningDistance(300000000);
-                        fakeBorder.setWarningTime(realBorder.getWarningTime());
-
-                        player.setWorldBorder(fakeBorder);
-                    } else {
-                        player.setWorldBorder(realBorder);
-                    }
-                }
+                Bukkit.getOnlinePlayers().stream()
+                        .filter(p -> p.getGameMode().equals(GameMode.SURVIVAL))
+                        .forEach(player -> {
+                            double y = player.getLocation().getY();
+                            if (y < minY1 || y > maxY1) {
+                                player.damage(4.0);
+                            }
+                        });
             }
         };
         damageTask.runTaskTimer(plugin, 0, 20);
@@ -118,7 +102,9 @@ public class VerticalBorder {
                         fakeBorder.setDamageAmount(realBorder.getDamageAmount());
                         fakeBorder.setDamageBuffer(realBorder.getDamageBuffer());
                         fakeBorder.setSize(realBorder.getSize());
-                        fakeBorder.setSize(realBorder.getSize() - 0.001, 1);
+                        if (shrinking) {
+                            fakeBorder.setSize(realBorder.getSize() - 0.001, 1);
+                        }
                         fakeBorder.setWarningTime(realBorder.getWarningTime());
                         fakeBorder.setWarningDistance(300000000);
                         player.setWorldBorder(fakeBorder);
