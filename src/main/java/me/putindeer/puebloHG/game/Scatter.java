@@ -95,7 +95,7 @@ public class Scatter implements Listener {
                     plugin.totalPlayers = scattering.size();
                     scattering.clear();
                     Bukkit.getOnlinePlayers().forEach(p -> p.showTitle(Title.title(plugin.utils.chat("&b¡La partida ha empezado!"), plugin.utils.chat("&cBuena suerte"))));
-                    plugin.getServer().getOnlinePlayers().forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 600, 9)));
+                    Bukkit.getOnlinePlayers().forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 600, 9)));
 
                     plugin.gameManager.started = true;
                     Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(800);
@@ -194,6 +194,10 @@ public class Scatter implements Listener {
             public void run() {
                 if (timeLeft <= 0) {
                     plugin.utils.broadcast("&4¡El mapa se ha cerrado completamente!");
+                    Bukkit.getOnlinePlayers().stream()
+                            .filter(player -> player.getGameMode() == GameMode.SURVIVAL)
+                            .filter(player -> plugin.alivePlayers.contains(player.getUniqueId()))
+                            .forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0)));
                     cancel();
                     eventTimer = null;
                     return;

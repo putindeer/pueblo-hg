@@ -72,6 +72,7 @@ public class Scoreboards {
     private static Integer playingCount() {
         return (int) Bukkit.getOnlinePlayers().stream()
                 .filter(p -> p.getGameMode() != GameMode.SPECTATOR)
+                .filter(p -> !plugin.gameManager.started || plugin.alivePlayers.contains(p.getUniqueId()))
                 .count();
     }
 }

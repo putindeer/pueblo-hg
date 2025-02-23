@@ -11,6 +11,7 @@ import org.bukkit.block.data.Openable;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -296,6 +297,18 @@ public class GameManager implements Listener {
             doors.add(block.getLocation());
         }
     }
+
+    @EventHandler
+    public void onWindChargeExplode(EntityExplodeEvent event) {
+        if (event.getEntity() instanceof WindCharge) {
+            for (Block block : event.blockList()) {
+                if (block.getBlockData() instanceof Openable) {
+                    doors.add(block.getLocation());
+                }
+            }
+        }
+    }
+
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
