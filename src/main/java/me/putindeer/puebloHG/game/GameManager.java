@@ -84,7 +84,7 @@ public class GameManager implements Listener {
                 )));
 
         new BukkitRunnable() {
-            int countdown = 30;
+            int countdown = 20;
 
             @Override
             public void run() {
@@ -94,8 +94,8 @@ public class GameManager implements Listener {
                     return;
                 }
 
-                if (countdown == 30) {
-                    plugin.utils.broadcast("&eLa partida se reiniciará en &630 segundos&e.");
+                if (countdown == 20) {
+                    plugin.utils.broadcast("&eLa partida se reiniciará en &620 segundos&e.");
                 } else if (countdown <= 5) {
                     plugin.utils.broadcast("&cReiniciando en &4" + countdown + "...");
                 }
@@ -173,6 +173,7 @@ public class GameManager implements Listener {
             Location loc = new Location(Bukkit.getWorld("world"), -999.5, 100, 1000.5);
             p.teleport(loc);
             plugin.utils.restorePlayer(p);
+            p.setGameMode(GameMode.SURVIVAL);
         }
 
         plugin.alivePlayers.clear();

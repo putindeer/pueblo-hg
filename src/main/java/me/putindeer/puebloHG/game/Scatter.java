@@ -68,6 +68,7 @@ public class Scatter implements Listener {
                     Location nextLocation = iterator.next();
                     Player p = playerIterator.next();
                     p.teleportAsync(nextLocation);
+                    p.setGameMode(GameMode.SURVIVAL);
                     plugin.utils.restorePlayer(p);
                     scattering.add(p);
                     plugin.alivePlayers.add(p.getUniqueId());

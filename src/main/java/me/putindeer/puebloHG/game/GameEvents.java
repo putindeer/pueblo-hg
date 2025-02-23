@@ -48,7 +48,6 @@ public class GameEvents implements Listener {
             } else if (!plugin.alivePlayers.contains(p.getUniqueId())){
                 p.teleport(new Location(p.getWorld(), 0, 94, 11));
                 p.setGameMode(GameMode.SPECTATOR);
-                p.setStatistic(Statistic.PLAYER_KILLS, 0);
                 plugin.utils.restorePlayer(p);
             }
         }

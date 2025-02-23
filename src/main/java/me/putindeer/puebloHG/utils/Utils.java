@@ -93,9 +93,9 @@ public class Utils {
     }
     public void broadcastNoPrefix(Component c) {
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.sendMessage(chat(c));
+            p.sendMessage(c);
         }
-        Bukkit.getConsoleSender().sendMessage(chat(c));
+        Bukkit.getConsoleSender().sendMessage(c);
     }
 
     /**
@@ -194,7 +194,6 @@ public class Utils {
         p.setFireTicks(0);
         p.setItemOnCursor(new ItemStack(Material.AIR));
         p.setInvulnerable(false);
-        p.setGameMode(GameMode.SURVIVAL);
         p.setStatistic(Statistic.PLAYER_KILLS, 0);
         p.setWorldBorder(p.getWorld().getWorldBorder());
     }
