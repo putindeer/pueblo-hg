@@ -344,7 +344,6 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        if (!started) return;
         Player player = event.getPlayer();
         if (!plugin.alivePlayers.contains(player.getUniqueId())) return;
         UUID uuid = player.getUniqueId();
