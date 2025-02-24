@@ -31,11 +31,11 @@ public class Scoreboards {
             lines.add(plugin.utils.chat("Tiempo de partida: &3" + plugin.timer));
             lines.add(Component.empty());
 
-            int pvpTime = Math.max(plugin.scatter.timeLeft - (24 * 60 + 30), 0);
-            int borderTime = Math.max(plugin.scatter.timeLeft - (15 * 60), 0);
-            int restockTime = Math.max(plugin.scatter.timeLeft - (10 * 60), 0);
+            int pvpTime = Math.max(plugin.scatter.timeLeft - (14 * 60 + 30), 0);
+            int borderTime = Math.max(plugin.scatter.timeLeft - (10 * 60), 0);
+            int restockTime = Math.max(plugin.scatter.timeLeft - (5 * 60), 0);
             int verticalBorderTime = Math.max(plugin.scatter.timeLeft - (5 * 60), 0);
-            int borderCloseTime = (plugin.scatter.timeLeft <= (15 * 60)) ? plugin.scatter.timeLeft : 0;
+            int borderCloseTime = (plugin.scatter.timeLeft <= (10 * 60)) ? plugin.scatter.timeLeft : 0;
 
             String pvpFormatted = formatTime(pvpTime);
             String borderFormatted = formatTime(borderTime);

@@ -188,7 +188,7 @@ public class Scatter implements Listener {
     );
 
     private void startTimers() {
-        timeLeft = 25 * 60;
+        timeLeft = 15 * 60;
         eventTimer = new BukkitRunnable() {
             @Override
             public void run() {
@@ -207,29 +207,26 @@ public class Scatter implements Listener {
                 }
 
                 int nextEventTime = 0;
-                if (timeLeft > 24 * 60 + 30) nextEventTime = 24 * 60 + 30;
-                else if (timeLeft > 15 * 60) nextEventTime = 15 * 60;
-                else if (timeLeft > 10 * 60) nextEventTime = 10 * 60;
+                if (timeLeft > 24 * 60 + 30) nextEventTime = 14 * 60 + 30;
+                else if (timeLeft > 15 * 60) nextEventTime = 10 * 60;
                 else if (timeLeft > 5 * 60) nextEventTime = 5 * 60;
 
                 int timeUntilNextEvent = timeLeft - nextEventTime;
 
                 switch (timeLeft) {
-                    case 24 * 60 + 30 -> {
+                    case 14 * 60 + 30 -> {
                         World world = Bukkit.getWorld("world");
                         assert world != null;
                         world.setPVP(true);
                         plugin.utils.broadcast("&cEl PvP ha sido activado. Buena suerte.", Sound.ENTITY_WITHER_SPAWN);
                     }
-                    case 15 * 60 -> {
-                        plugin.utils.broadcast("&eEl borde del mundo se empezó a reducir. Se reducirá completamente en 15 minutos.", Sound.ENTITY_BLAZE_DEATH);
-                        Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(74, 900);
-                    }
                     case 10 * 60 -> {
-                        plugin.utils.broadcast("&6¡Los cofres han sido reabastecidos!", Sound.ENTITY_VILLAGER_WORK_FLETCHER);
-                        restock();
+                        plugin.utils.broadcast("&eEl borde del mundo se empezó a reducir. Se reducirá completamente en 15 minutos.", Sound.ENTITY_BLAZE_DEATH);
+                        Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(74, 600);
                     }
                     case 5 * 60 -> {
+                        plugin.utils.broadcast("&6¡Los cofres han sido reabastecidos!", Sound.ENTITY_VILLAGER_WORK_FLETCHER);
+                        restock();
                         plugin.utils.broadcast("&dEl borde ahora se cerrará verticalmente.", Sound.ENTITY_BLAZE_DEATH);
                         plugin.verticalBorder.start();
                     }
