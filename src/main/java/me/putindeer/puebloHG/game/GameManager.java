@@ -1,6 +1,8 @@
 package me.putindeer.puebloHG.game;
 
 import me.putindeer.puebloHG.Main;
+import me.putindeer.puebloHG.utils.Utils;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,6 +23,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import net.kyori.adventure.sound.Sound;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -110,7 +113,7 @@ public class GameManager implements Listener {
         if (winner != null) {
             plugin.pointsManager.addPoints(winner.getUniqueId(), winPoints);
             plugin.utils.message(winner, "&a+" + winPoints + " puntos por ganar.");
-            plugin.utils.broadcast("&e¡" + winner.getName() + " ha ganado la partida!", Sound.ENTITY_WITHER_DEATH);
+            plugin.utils.broadcast(Sound.sound(Key.key("entity.wither.death"), Sound.Source.MASTER, 10f, 1f), "&e¡" + winner.getName() + " ha ganado la partida!");
             spawnFireworks(winner.getLocation());
             winner.showTitle(Title.title(
                     plugin.utils.chat("&a¡Has ganado la partida!"),
@@ -173,7 +176,7 @@ public class GameManager implements Listener {
         for (Player p : Bukkit.getOnlinePlayers()) {
             Location loc = new Location(Bukkit.getWorld("world"), -999.5, 100, 1000.5);
             p.teleport(loc);
-            plugin.utils.restorePlayer(p);
+            Utils.restorePlayer(p);
             p.setGameMode(GameMode.SURVIVAL);
         }
 
@@ -264,10 +267,7 @@ public class GameManager implements Listener {
             Player survivor = plugin.getServer().getPlayer(uuid);
             if (survivor == null) return;
 
-            survivor.playSound(survivor.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1);
-
-
-            plugin.utils.message(survivor, "&a+" + survivePoints + " punto por sobrevivir.");
+            plugin.utils.message(survivor, Sound.sound(Key.key("entity.lightning_bolt.thunder"), Sound.Source.MASTER, 1.0f, 1f), "&a+" + survivePoints + " punto por sobrevivir.");
         });
     }
 
@@ -364,7 +364,7 @@ public class GameManager implements Listener {
                 if (timeLeft <= 0) {
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         if (!Bukkit.getOfflinePlayer(uuid).isOnline()) {
-                            plugin.utils.broadcastNoPrefix(handleDeathMessage(Component.text(player.getName() + " murió por desconectarse."), player, null));
+                            plugin.utils.broadcast(handleDeathMessage(Component.text(player.getName() + " murió por desconectarse."), player, null));
                             resetPlayerAfterDeath(player);
                             handlePoints(player, null);
                             checkForWinner();

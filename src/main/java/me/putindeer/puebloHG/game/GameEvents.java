@@ -3,6 +3,7 @@ package me.putindeer.puebloHG.game;
 import com.destroystokyo.paper.event.block.AnvilDamagedEvent;
 import fr.mrmicky.fastboard.adventure.FastBoard;
 import me.putindeer.puebloHG.Main;
+import me.putindeer.puebloHG.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.Event;
@@ -44,11 +45,11 @@ public class GameEvents implements Listener {
                 Location loc = new Location(Bukkit.getWorld("world"), -999.5, 100, 1000.5);
                 p.teleport(loc);
                 p.setGameMode(GameMode.SURVIVAL);
-                plugin.utils.restorePlayer(p);
+                Utils.restorePlayer(p);
             } else if (!plugin.alivePlayers.contains(p.getUniqueId())){
                 p.teleport(new Location(p.getWorld(), 0, 94, 11));
                 p.setGameMode(GameMode.SPECTATOR);
-                plugin.utils.restorePlayer(p);
+                Utils.restorePlayer(p);
             }
         }
     }

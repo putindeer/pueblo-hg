@@ -7,8 +7,8 @@ import me.putindeer.puebloHG.game.PointsManager;
 import me.putindeer.puebloHG.game.Scatter;
 import me.putindeer.puebloHG.game.VerticalBorder;
 import me.putindeer.puebloHG.utils.StartThings;
-import me.putindeer.puebloHG.utils.Utils;
 import org.bukkit.plugin.java.JavaPlugin;
+import us.polarismc.api.util.PluginUtils;
 
 import java.util.*;
 
@@ -16,7 +16,7 @@ public final class Main extends JavaPlugin {
     @Getter
     public static Main pl;
     public int totalPlayers = -1;
-    public Utils utils;
+    public PluginUtils utils;
     public GameManager gameManager;
     public PointsManager pointsManager;
     public Scatter scatter;
@@ -29,7 +29,7 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         pl = this;
-        utils = new Utils();
+        utils = new PluginUtils(this, "&8[&3HG&8] &f");
         new StartThings(this);
     }
 

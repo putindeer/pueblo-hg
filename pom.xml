@@ -97,5 +97,10 @@
             <version>2.11.5</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>us.polarismc</groupId>
+            <artifactId>polaris-api</artifactId>
+            <version>1.0.1</version>
+        </dependency>
     </dependencies>
 </project>

@@ -2,8 +2,11 @@ package me.putindeer.puebloHG.game;
 
 import lombok.Getter;
 import me.putindeer.puebloHG.Main;
+import me.putindeer.puebloHG.utils.Utils;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -69,11 +72,11 @@ public class Scatter implements Listener {
                     Player p = playerIterator.next();
                     p.teleportAsync(nextLocation);
                     p.setGameMode(GameMode.SURVIVAL);
-                    plugin.utils.restorePlayer(p);
+                    Utils.restorePlayer(p);
                     scattering.add(p);
                     plugin.alivePlayers.add(p.getUniqueId());
                     scattered[0]++;
-                    plugin.utils.broadcastNoPrefix("&8[&7" + scattered[0] + "&8/&7" + maximumPlayers + "&8] &3" + p.getName());
+                    plugin.utils.broadcast(false, "&8[&7" + scattered[0] + "&8/&7" + maximumPlayers + "&8] &3" + p.getName());
                 } else {start(); cancel();}
             }
         }.runTaskTimer(plugin, 0L, 5L);
@@ -111,7 +114,7 @@ public class Scatter implements Listener {
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     player.showTitle(Title.title(plugin.utils.chat(color + finalI), Component.empty()));
-                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 1);
+                    player.playSound(Sound.sound(Key.key("block.note_block.harp"), net.kyori.adventure.sound.Sound.Source.MASTER, 1.0f, 1f));
                 }
 
                 counter[0]--;
@@ -193,14 +196,11 @@ public class Scatter implements Listener {
             @Override
             public void run() {
                 if (timeLeft <= 0) {
-                    plugin.utils.broadcast("&4¡El mapa se ha cerrado completamente!");
+                    plugin.utils.broadcast(Sound.sound(Key.key("entity.allay.death"), net.kyori.adventure.sound.Sound.Source.MASTER, 1.0f, 0.1f), "&4¡El mapa se ha cerrado completamente!");
                     Bukkit.getOnlinePlayers().stream()
                             .filter(player -> player.getGameMode() == GameMode.SURVIVAL)
                             .filter(player -> plugin.alivePlayers.contains(player.getUniqueId()))
-                            .forEach(player -> {
-                                player.playSound(player.getLocation(), Sound.ENTITY_ALLAY_DEATH, 1.0f, 0.1f);
-                                player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0));
-                            });
+                            .forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0)));
                     cancel();
                     eventTimer = null;
                     return;
@@ -218,16 +218,16 @@ public class Scatter implements Listener {
                         World world = Bukkit.getWorld("world");
                         assert world != null;
                         world.setPVP(true);
-                        plugin.utils.broadcast("&cEl PvP ha sido activado. Buena suerte.", Sound.ENTITY_WITHER_SPAWN);
+                        plugin.utils.broadcast(Sound.sound(Key.key("entity.wither.spawn"), net.kyori.adventure.sound.Sound.Source.MASTER, 1.0f, 1f), "&cEl PvP ha sido activado. Buena suerte.");
                     }
                     case 10 * 60 -> {
-                        plugin.utils.broadcast("&eEl borde del mundo se empezó a reducir. Se reducirá completamente en 10 minutos.", Sound.ENTITY_BLAZE_DEATH);
+                        plugin.utils.broadcast(Sound.sound(Key.key("entity.blaze.death"), net.kyori.adventure.sound.Sound.Source.MASTER, 1.0f, 1f), "&eEl borde del mundo se empezó a reducir. Se reducirá completamente en 10 minutos.");
                         Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(55, 600);
                     }
                     case 5 * 60 -> {
-                        plugin.utils.broadcast("&6¡Los cofres han sido reabastecidos!", Sound.ENTITY_VILLAGER_WORK_FLETCHER);
+                        plugin.utils.broadcast(Sound.sound(Key.key("entity.villager.work_fletcher"), net.kyori.adventure.sound.Sound.Source.MASTER, 1.0f, 1f), "&6¡Los cofres han sido reabastecidos!");
                         restock();
-                        plugin.utils.broadcast("&dEl borde ahora se cerrará verticalmente.", Sound.ENTITY_BLAZE_DEATH);
+                        plugin.utils.broadcast(Sound.sound(Key.key("entity.blaze.death"), net.kyori.adventure.sound.Sound.Source.MASTER, 1.0f, 1f), "&dEl borde ahora se cerrará verticalmente.");
                         plugin.verticalBorder.start();
                     }
                 }
