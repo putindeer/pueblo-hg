@@ -2,13 +2,15 @@ package me.putindeer.puebloHG.game;
 
 import me.putindeer.puebloHG.Main;
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class VerticalBorder {
     private final Main plugin;
-    private double minY1 = 30, maxY1 = 122;
-    private final double targetMinY = 71, targetMaxY = 81;
+    private int minY, maxY;
+    private double y1, y2;
+    private double targetMinY, targetMaxY;
     private int transitionTime;
     private boolean shrinking = false;
 
@@ -16,6 +18,16 @@ public class VerticalBorder {
 
     public VerticalBorder(Main plugin) {
         this.plugin = plugin;
+        loadConfigValues();
+    }
+
+    public void loadConfigValues() {
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection("verticalborder");
+        assert section != null;
+        minY = section.getInt("minY", 30);
+        maxY = section.getInt("maxY", 122);
+        targetMinY = section.getDouble("targetMinY", 71);
+        targetMaxY = section.getDouble("targetMaxY", 81);
     }
 
     public void start(int time) {
@@ -60,8 +72,8 @@ public class VerticalBorder {
                 }
 
                 double progress = (double) ticks / transitionTime;
-                minY1 = 30 + (targetMinY - 30) * progress;
-                maxY1 = 122 + (targetMaxY - 122) * progress;
+                y1 = minY + (targetMinY - minY) * progress;
+                y2 = maxY + (targetMaxY - maxY) * progress;
 
                 ticks += 10;
             }
@@ -78,7 +90,7 @@ public class VerticalBorder {
                         .filter(p -> p.getGameMode().equals(GameMode.SURVIVAL))
                         .forEach(player -> {
                             double y = player.getLocation().getY();
-                            if (y < minY1 || y > maxY1) {
+                            if (y < y1 || y > y2) {
                                 player.damage(4.0);
                             }
                         });
@@ -96,7 +108,7 @@ public class VerticalBorder {
                     World world = player.getWorld();
                     WorldBorder realBorder = world.getWorldBorder();
 
-                    if ((y - minY1) <= 3 || (maxY1 - y) <= 3) {
+                    if ((y - y1) <= 3 || (y2 - y) <= 3) {
                         WorldBorder fakeBorder = Bukkit.createWorldBorder();
 
                         fakeBorder.setCenter(realBorder.getCenter());
@@ -125,8 +137,8 @@ public class VerticalBorder {
             public void run() {
                 for (World world : Bukkit.getWorlds()) {
                     if (world.getPlayers().isEmpty()) continue;
-                    spawnBorderParticles(world, minY1, false);
-                    spawnBorderParticles(world, maxY1, true);
+                    spawnBorderParticles(world, y1, false);
+                    spawnBorderParticles(world, y2, true);
                 }
             }
         };

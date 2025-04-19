@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,11 +55,14 @@ public class RegisterChests implements CommandExecutor {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
         World world = Bukkit.getWorld("world");
-        int minY = 30;
-        int maxY = 110;
-
-        for (int x = -400; x <= 400; x++) {
-            for (int z = -400; z <= 400; z++) {
+        int minY, maxY;
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection("verticalborder");
+        assert section != null;
+        minY = section.getInt("minY", 30);
+        maxY = section.getInt("maxY", 122);
+        int border = plugin.getConfig().getInt("border", 800) / 2;
+        for (int x = -border; x <= border; x++) {
+            for (int z = -border; z <= border; z++) {
                 for (int y = minY; y <= maxY; y++) {
                     Location loc = new Location(world, x, y, z);
                     Block block = loc.getBlock();

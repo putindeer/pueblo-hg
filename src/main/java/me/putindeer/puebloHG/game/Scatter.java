@@ -51,7 +51,7 @@ public class Scatter implements Listener {
         Collections.shuffle(players);
         Iterator<Player> playerIterator = players.iterator();
         final int[] scattered = {0};
-        int maximumPlayers = Math.min(players.size(), 44);
+        int maximumPlayers = Math.min(players.size(), locations.size());
 
         new BukkitRunnable() {
             @Override
@@ -102,7 +102,8 @@ public class Scatter implements Listener {
                     Bukkit.getOnlinePlayers().forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 600, 9)));
 
                     plugin.gameManager.started = true;
-                    Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(800);
+                    int border = plugin.getConfig().getInt("border", 800);
+                    Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(border);
 
                     startTimers();
                     cancel();

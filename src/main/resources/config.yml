@@ -29,3 +29,11 @@ game-events:
   glowing:
     type: GLOWING
     time: 900
+# Borde vertical
+verticalborder:
+  minY: 30
+  maxY: 122
+  targetMinY: 71
+  targetMaxY: 81
+# Borde horizontal, el borde inicial (400x400 = 800)
+border: 800
