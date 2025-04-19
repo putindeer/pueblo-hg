@@ -2,6 +2,7 @@ package me.putindeer.puebloHG.utils;
 
 import me.putindeer.puebloHG.Main;
 import me.putindeer.puebloHG.commands.*;
+import me.putindeer.puebloHG.config.game.GameEventLoader;
 import me.putindeer.puebloHG.game.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -48,6 +49,7 @@ public class StartThings {
     }
 
     public void registerCommands() {
+        new AddLocation(plugin);
         new ForceEnd(plugin);
         new Leaderboard(plugin);
         new RegisterChests(plugin);
@@ -57,6 +59,7 @@ public class StartThings {
 
     public void registerGameHandlers() {
         new GameEvents(plugin);
+        plugin.events = new GameEventLoader(plugin).loadEventsFromConfig();
         plugin.gameManager = new GameManager(plugin);
         plugin.pointsManager = new PointsManager(plugin);
         plugin.scatter = new Scatter(plugin);

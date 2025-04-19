@@ -9,7 +9,7 @@ public class VerticalBorder {
     private final Main plugin;
     private double minY1 = 30, maxY1 = 122;
     private final double targetMinY = 71, targetMaxY = 81;
-    private final int transitionTime = 5 * 60 * 20;
+    private int transitionTime;
     private boolean shrinking = false;
 
     private BukkitRunnable borderShrinkTask, damageTask, borderDisplayTask, particleTask;
@@ -18,7 +18,8 @@ public class VerticalBorder {
         this.plugin = plugin;
     }
 
-    public void start() {
+    public void start(int time) {
+        transitionTime = time;
         startBorderShrinkTask();
         startDamageTask();
         startBorderDisplayTask();

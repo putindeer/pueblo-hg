@@ -1,0 +1,223 @@
+# Configuración de ubicaciones para el scatter
+# Cada ubicación tiene coordenadas x, y, z en el mundo "world"
+locations:
+  location-1:
+    world: "world"
+    x: 12.5
+    y: 73
+    z: 13.5
+  location-2:
+    world: "world"
+    x: 8.5
+    y: 73
+    z: 15.5
+  location-3:
+    world: "world"
+    x: 3.5
+    y: 73
+    z: 17.5
+  location-4:
+    world: "world"
+    x: -0.5
+    y: 73
+    z: 18.5
+  location-5:
+    world: "world"
+    x: -4.5
+    y: 73
+    z: 17.5
+  location-6:
+    world: "world"
+    x: -9.5
+    y: 73
+    z: 15.5
+  location-7:
+    world: "world"
+    x: -13.5
+    y: 73
+    z: 13.5
+  location-8:
+    world: "world"
+    x: -15.5
+    y: 73
+    z: 9.5
+  location-9:
+    world: "world"
+    x: -17.5
+    y: 73
+    z: 4.5
+  location-10:
+    world: "world"
+    x: -18.5
+    y: 73
+    z: 0.5
+  location-11:
+    world: "world"
+    x: -17.5
+    y: 73
+    z: -3.5
+  location-12:
+    world: "world"
+    x: -15.5
+    y: 73
+    z: -8.5
+  location-13:
+    world: "world"
+    x: -13.5
+    y: 73
+    z: -12.5
+  location-14:
+    world: "world"
+    x: -9.5
+    y: 73
+    z: -14.5
+  location-15:
+    world: "world"
+    x: -4.5
+    y: 73
+    z: -16.5
+  location-16:
+    world: "world"
+    x: -0.5
+    y: 73
+    z: -17.5
+  location-17:
+    world: "world"
+    x: 3.5
+    y: 73
+    z: -16.5
+  location-18:
+    world: "world"
+    x: 8.5
+    y: 73
+    z: -14.5
+  location-19:
+    world: "world"
+    x: 12.5
+    y: 73
+    z: -12.5
+  location-20:
+    world: "world"
+    x: 14.5
+    y: 73
+    z: -8.5
+  location-21:
+    world: "world"
+    x: 16.5
+    y: 73
+    z: -3.5
+  location-22:
+    world: "world"
+    x: 17.5
+    y: 73
+    z: 0.5
+  location-23:
+    world: "world"
+    x: 16.5
+    y: 73
+    z: 4.5
+  location-24:
+    world: "world"
+    x: 14.5
+    y: 73
+    z: 9.5
+  location-25:
+    world: "world"
+    x: 11.5
+    y: 73
+    z: -3.5
+  location-26:
+    world: "world"
+    x: 12.5
+    y: 73
+    z: 0.5
+  location-27:
+    world: "world"
+    x: 11.5
+    y: 73
+    z: 4.5
+  location-28:
+    world: "world"
+    x: 10.5
+    y: 73
+    z: 8.5
+  location-29:
+    world: "world"
+    x: 7.5
+    y: 73
+    z: 11.5
+  location-30:
+    world: "world"
+    x: 3.5
+    y: 73
+    z: 12.5
+  location-31:
+    world: "world"
+    x: -0.5
+    y: 73
+    z: 13.5
+  location-32:
+    world: "world"
+    x: -4.5
+    y: 73
+    z: 12.5
+  location-33:
+    world: "world"
+    x: -8.5
+    y: 73
+    z: 11.5
+  location-34:
+    world: "world"
+    x: -11.5
+    y: 73
+    z: 8.5
+  location-35:
+    world: "world"
+    x: -12.5
+    y: 73
+    z: 4.5
+  location-36:
+    world: "world"
+    x: -13.5
+    y: 73
+    z: 0.5
+  location-37:
+    world: "world"
+    x: -12.5
+    y: 73
+    z: -3.5
+  location-38:
+    world: "world"
+    x: -11.5
+    y: 73
+    z: -7.5
+  location-39:
+    world: "world"
+    x: -8.5
+    y: 73
+    z: -10.5
+  location-40:
+    world: "world"
+    x: -4.5
+    y: 73
+    z: -11.5
+  location-41:
+    world: "world"
+    x: -0.5
+    y: 73
+    z: -12.5
+  location-42:
+    world: "world"
+    x: 3.5
+    y: 73
+    z: -11.5
+  location-43:
+    world: "world"
+    x: 7.5
+    y: 73
+    z: -10.5
+  location-44:
+    world: "world"
+    x: 10.5
+    y: 73
+    z: -7.5

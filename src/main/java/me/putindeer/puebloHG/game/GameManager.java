@@ -7,9 +7,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Openable;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,7 +25,6 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import net.kyori.adventure.sound.Sound;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -51,11 +52,13 @@ public class GameManager implements Listener {
     }
 
     private void assignPointsValues() {
-        winPoints = plugin.getConfig().getInt("win-points");
-        secondPlacePoints = plugin.getConfig().getInt("second-place");
-        thirdPlacePoints = plugin.getConfig().getInt("third-place");
-        killPoints = plugin.getConfig().getInt("kill-points");
-        survivePoints = plugin.getConfig().getInt("survive-points");
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection("points");
+        assert section != null;
+        winPoints = section.getInt("win-points");
+        secondPlacePoints = section.getInt("second-place");
+        thirdPlacePoints = section.getInt("third-place");
+        killPoints = section.getInt("kill-points");
+        survivePoints = section.getInt("survive-points");
     }
 
     private void checkForWinner() {
@@ -186,7 +189,7 @@ public class GameManager implements Listener {
         plugin.totalPlayers = -1;
         started = false;
         finalized = false;
-        plugin.scatter.timeLeft = 25 * 60;
+        plugin.scatter.time = 0;
         restock();
     }
 

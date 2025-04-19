@@ -2,7 +2,9 @@ package me.putindeer.puebloHG.game;
 
 import lombok.Getter;
 import me.putindeer.puebloHG.Main;
+import me.putindeer.puebloHG.config.locations.LocationManager;
 import me.putindeer.puebloHG.utils.Utils;
+import me.putindeer.puebloHG.config.game.GameEvent;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -20,21 +22,20 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static me.putindeer.puebloHG.commands.Restock.restock;
-
 public class Scatter implements Listener {
     private final Main plugin;
-    public BukkitTask eventTimer;
-    public int gameTimer;
+    public BukkitTask timer;
+    public final List<Location> locations = new ArrayList<>();
     public final List<Player> scattering = new ArrayList<>();
     @Getter
     public boolean scatter = false;
     @Getter
-    public int timeLeft;
+    public int time;
 
     public Scatter(Main plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        plugin.locationManager = new LocationManager(plugin);
     }
 
     public void scatter() {
@@ -103,7 +104,6 @@ public class Scatter implements Listener {
                     plugin.gameManager.started = true;
                     Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(800);
 
-                    time();
                     startTimers();
                     cancel();
                     return;
@@ -123,14 +123,9 @@ public class Scatter implements Listener {
     }
 
     public void stop() {
-        if (gameTimer != -1) {
-            Bukkit.getScheduler().cancelTask(gameTimer);
-            gameTimer = -1;
-        }
-
-        if (eventTimer != null) {
-            eventTimer.cancel();
-            eventTimer = null;
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
         }
     }
 
@@ -143,125 +138,44 @@ public class Scatter implements Listener {
         e.setCancelled(true);
     }
 
-    public final List<Location> locations = Arrays.asList(
-            new Location(Bukkit.getWorld("world"), 12.5, 73, 13.5),
-            new Location(Bukkit.getWorld("world"), 8.5, 73, 15.5),
-            new Location(Bukkit.getWorld("world"), 3.5, 73, 17.5),
-            new Location(Bukkit.getWorld("world"), -0.5, 73, 18.5),
-            new Location(Bukkit.getWorld("world"), -4.5, 73, 17.5),
-            new Location(Bukkit.getWorld("world"), -9.5, 73, 15.5),
-            new Location(Bukkit.getWorld("world"), -13.5, 73, 13.5),
-            new Location(Bukkit.getWorld("world"), -15.5, 73, 9.5),
-            new Location(Bukkit.getWorld("world"), -17.5, 73, 4.5),
-            new Location(Bukkit.getWorld("world"), -18.5, 73, 0.5),
-            new Location(Bukkit.getWorld("world"), -17.5, 73, -3.5),
-            new Location(Bukkit.getWorld("world"), -15.5, 73, -8.5),
-            new Location(Bukkit.getWorld("world"), -13.5, 73, -12.5),
-            new Location(Bukkit.getWorld("world"), -9.5, 73, -14.5),
-            new Location(Bukkit.getWorld("world"), -4.5, 73, -16.5),
-            new Location(Bukkit.getWorld("world"), -0.5, 73, -17.5),
-            new Location(Bukkit.getWorld("world"), 3.5, 73, -16.5),
-            new Location(Bukkit.getWorld("world"), 8.5, 73, -14.5),
-            new Location(Bukkit.getWorld("world"), 12.5, 73, -12.5),
-            new Location(Bukkit.getWorld("world"), 14.5, 73, -8.5),
-            new Location(Bukkit.getWorld("world"), 16.5, 73, -3.5),
-            new Location(Bukkit.getWorld("world"), 17.5, 73, 0.5),
-            new Location(Bukkit.getWorld("world"), 16.5, 73, 4.5),
-            new Location(Bukkit.getWorld("world"), 14.5, 73, 9.5),
-            new Location(Bukkit.getWorld("world"), 11.5, 73, -3.5),
-            new Location(Bukkit.getWorld("world"), 12.5, 73, 0.5),
-            new Location(Bukkit.getWorld("world"), 11.5, 73, 4.5),
-            new Location(Bukkit.getWorld("world"), 10.5, 73, 8.5),
-            new Location(Bukkit.getWorld("world"), 7.5, 73, 11.5),
-            new Location(Bukkit.getWorld("world"), 3.5, 73, 12.5),
-            new Location(Bukkit.getWorld("world"), -0.5, 73, 13.5),
-            new Location(Bukkit.getWorld("world"), -4.5, 73, 12.5),
-            new Location(Bukkit.getWorld("world"), -8.5, 73, 11.5),
-            new Location(Bukkit.getWorld("world"), -11.5, 73, 8.5),
-            new Location(Bukkit.getWorld("world"), -12.5, 73, 4.5),
-            new Location(Bukkit.getWorld("world"), -13.5, 73, 0.5),
-            new Location(Bukkit.getWorld("world"), -12.5, 73, -3.5),
-            new Location(Bukkit.getWorld("world"), -11.5, 73, -7.5),
-            new Location(Bukkit.getWorld("world"), -8.5, 73, -10.5),
-            new Location(Bukkit.getWorld("world"), -4.5, 73, -11.5),
-            new Location(Bukkit.getWorld("world"), -0.5, 73, -12.5),
-            new Location(Bukkit.getWorld("world"), 3.5, 73, -11.5),
-            new Location(Bukkit.getWorld("world"), 7.5, 73, -10.5),
-            new Location(Bukkit.getWorld("world"), 10.5, 73, -7.5)
-    );
-
     private void startTimers() {
-        timeLeft = 15 * 60;
-        eventTimer = new BukkitRunnable() {
+        time = 0;
+        timer = new BukkitRunnable() {
             @Override
             public void run() {
-                if (timeLeft <= 0) {
-                    plugin.utils.broadcast(Sound.sound(Key.key("entity.allay.death"), net.kyori.adventure.sound.Sound.Source.MASTER, 1.0f, 0.1f), "&4¡El mapa se ha cerrado completamente!");
-                    Bukkit.getOnlinePlayers().stream()
-                            .filter(player -> player.getGameMode() == GameMode.SURVIVAL)
-                            .filter(player -> plugin.alivePlayers.contains(player.getUniqueId()))
-                            .forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0)));
-                    cancel();
-                    eventTimer = null;
-                    return;
-                }
-
-                int nextEventTime = 0;
-                if (timeLeft > 14 * 60 + 30) nextEventTime = 14 * 60 + 30;
-                else if (timeLeft > 10 * 60) nextEventTime = 10 * 60;
-                else if (timeLeft > 5 * 60) nextEventTime = 5 * 60;
-
-                int timeUntilNextEvent = timeLeft - nextEventTime;
-
-                switch (timeLeft) {
-                    case 14 * 60 + 30 -> {
-                        World world = Bukkit.getWorld("world");
-                        assert world != null;
-                        world.setPVP(true);
-                        plugin.utils.broadcast(Sound.sound(Key.key("entity.wither.spawn"), net.kyori.adventure.sound.Sound.Source.MASTER, 1.0f, 1f), "&cEl PvP ha sido activado. Buena suerte.");
-                    }
-                    case 10 * 60 -> {
-                        plugin.utils.broadcast(Sound.sound(Key.key("entity.blaze.death"), net.kyori.adventure.sound.Sound.Source.MASTER, 1.0f, 1f), "&eEl borde del mundo se empezó a reducir. Se reducirá completamente en 10 minutos.");
-                        Objects.requireNonNull(Bukkit.getWorld("world")).getWorldBorder().setSize(55, 600);
-                    }
-                    case 5 * 60 -> {
-                        plugin.utils.broadcast(Sound.sound(Key.key("entity.villager.work_fletcher"), net.kyori.adventure.sound.Sound.Source.MASTER, 1.0f, 1f), "&6¡Los cofres han sido reabastecidos!");
-                        restock();
-                        plugin.utils.broadcast(Sound.sound(Key.key("entity.blaze.death"), net.kyori.adventure.sound.Sound.Source.MASTER, 1.0f, 1f), "&dEl borde ahora se cerrará verticalmente.");
-                        plugin.verticalBorder.start();
+                for (GameEvent event : plugin.events) {
+                    if (time == event.triggerTime()) {
+                        event.action().run();
                     }
                 }
 
-                int minutes = timeUntilNextEvent / 60;
-                int seconds = timeUntilNextEvent % 60;
-                String formattedTime = String.format("%02d:%02d", minutes, seconds);
+                int timeUntilNextEvent = getTimeUntilNextEvent(plugin.events);
 
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.sendActionBar(plugin.utils.chat("&ePróximo evento en: &c" + formattedTime));
+                    p.sendActionBar(plugin.utils.chat("&ePróximo evento en: &c" + plugin.utils.formatTime(timeUntilNextEvent)));
                 }
 
-                timeLeft--;
+                if (!plugin.gameManager.finalized) {
+                    plugin.timer = plugin.utils.formatTime(time);
+                }
+
+                time++;
             }
         }.runTaskTimer(plugin, 0L, 20L);
     }
 
-    private void time() {
-        gameTimer = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-            int min = 0;
-            int sec = 0;
+    private int getTimeUntilNextEvent(List<GameEvent> events) {
+        int timeUntilNextEvent = -1;
 
-            @Override
-            public void run() {
-                if (!plugin.gameManager.finalized) {
-                    sec++;
-                    if (sec == 60) {
-                        sec = 0;
-                        min++;
-                    }
-
-                    plugin.timer = String.format("%02d:%02d", min, sec);
+        for (GameEvent event : events) {
+            int eventTime = event.triggerTime();
+            if (eventTime < time) {
+                int diff = time - eventTime;
+                if (timeUntilNextEvent == -1 || diff < timeUntilNextEvent) {
+                    timeUntilNextEvent = diff;
                 }
             }
-        }, 0L, 20L);
+        }
+        return timeUntilNextEvent;
     }
 }

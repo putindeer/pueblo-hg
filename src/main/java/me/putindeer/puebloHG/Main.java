@@ -2,6 +2,8 @@ package me.putindeer.puebloHG;
 
 import fr.mrmicky.fastboard.adventure.FastBoard;
 import lombok.Getter;
+import me.putindeer.puebloHG.config.game.GameEvent;
+import me.putindeer.puebloHG.config.locations.LocationManager;
 import me.putindeer.puebloHG.game.GameManager;
 import me.putindeer.puebloHG.game.PointsManager;
 import me.putindeer.puebloHG.game.Scatter;
@@ -17,10 +19,12 @@ public final class Main extends JavaPlugin {
     public static Main pl;
     public int totalPlayers = -1;
     public PluginUtils utils;
+    public LocationManager locationManager;
     public GameManager gameManager;
     public PointsManager pointsManager;
     public Scatter scatter;
     public VerticalBorder verticalBorder;
+    public List<GameEvent> events = new ArrayList<>();
     public final Set<UUID> alivePlayers = new HashSet<>();
     public final List<UUID> deadPlayers = new ArrayList<>();
     public final Map<UUID, FastBoard> boards = new HashMap<>();

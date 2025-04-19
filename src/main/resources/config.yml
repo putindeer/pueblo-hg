@@ -1,5 +1,31 @@
-win-points: 10
-second-place: 6
-third-place: 4
-kill-points: 3
-survive-points: 1
+# Puntaje
+points:
+  win-points: 10
+  second-place: 6
+  third-place: 4
+  kill-points: 3
+  survive-points: 1
+# Eventos (con tiempo en segundos)
+# (NO MODIFIQUES EL TYPE)
+game-events:
+  pvp:
+    type: ENABLE_PVP
+    time: 30
+  border:
+    type: SHRINK_BORDER
+    time: 300
+  restock:
+    type: RESTOCK_CHESTS
+    time: 600
+  verticalborder:
+    type: VERTICAL_BORDER
+    time: 600
+  endverticalborder:
+    type: END_VERTICAL_BORDER
+    time: 900
+  endborder:
+    type: END_BORDER
+    time: 900
+  glowing:
+    type: GLOWING
+    time: 900

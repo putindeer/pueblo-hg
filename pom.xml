@@ -6,7 +6,7 @@
 
     <groupId>me.putindeer</groupId>
     <artifactId>PuebloHG</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
 
     <name>pueblohg</name>
@@ -77,7 +77,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.4-R0.1-SNAPSHOT</version>
+            <version>1.21.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>us.polarismc</groupId>
             <artifactId>polaris-api</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
 </project>
