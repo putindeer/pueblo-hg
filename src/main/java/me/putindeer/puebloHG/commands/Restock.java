@@ -33,6 +33,7 @@ public class Restock implements CommandExecutor {
         Random random = new Random();
         for (Location loc : locations) {
             Block block = loc.getBlock();
+            if (block.getType() != Material.CHEST) return;
             Chest chest = (Chest) block.getState();
             Inventory inv = chest.getInventory();
 

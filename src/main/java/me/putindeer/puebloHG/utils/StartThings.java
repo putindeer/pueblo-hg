@@ -3,6 +3,7 @@ package me.putindeer.puebloHG.utils;
 import me.putindeer.puebloHG.Main;
 import me.putindeer.puebloHG.commands.*;
 import me.putindeer.puebloHG.config.game.GameEventLoader;
+import me.putindeer.puebloHG.config.locations.LocationManager;
 import me.putindeer.puebloHG.game.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -63,6 +64,7 @@ public class StartThings {
         plugin.gameManager = new GameManager(plugin);
         plugin.pointsManager = new PointsManager(plugin);
         plugin.scatter = new Scatter(plugin);
+        plugin.locationManager = new LocationManager(plugin);
         plugin.verticalBorder = new VerticalBorder(plugin);
         new Placeholders().register();
     }

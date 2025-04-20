@@ -34,7 +34,7 @@ public class Scoreboards {
             List<Component> shownEvents = new ArrayList<>();
 
             for (GameEvent event : plugin.events) {
-                int seconds = Math.max(plugin.scatter.time - event.triggerTime(), 0);
+                int seconds = Math.max(event.triggerTime() - plugin.scatter.time, 0);
                 if (seconds == 0) continue;
 
                 switch (event.type()) {
@@ -43,7 +43,7 @@ public class Scoreboards {
                                 .filter(e -> e.type() == GameEventType.SHRINK_BORDER)
                                 .findFirst()
                                 .orElse(null);
-                        if (border != null && plugin.scatter.time > border.triggerTime()) {
+                        if (border != null && plugin.scatter.time < border.triggerTime()) {
                             continue;
                         }
                     }
@@ -51,7 +51,7 @@ public class Scoreboards {
                         GameEvent border = plugin.events.stream()
                                 .filter(e -> e.type() == GameEventType.VERTICAL_BORDER)
                                 .findFirst().orElse(null);
-                        if (border != null && plugin.scatter.time > border.triggerTime()) {
+                        if (border != null && plugin.scatter.time < border.triggerTime()) {
                             continue;
                         }
 
@@ -59,7 +59,7 @@ public class Scoreboards {
                                 .filter(e -> e.type() == GameEventType.END_BORDER)
                                 .findFirst().orElse(null);
                         if (endBorder != null) {
-                            int borderSeconds = Math.max(plugin.scatter.time - endBorder.triggerTime(), 0);
+                            int borderSeconds = Math.max(endBorder.triggerTime() - plugin.scatter.time, 0);
                             if (borderSeconds == seconds) {
                                 continue;
                             }
@@ -73,7 +73,7 @@ public class Scoreboards {
                             .filter(e -> e.type() == GameEventType.VERTICAL_BORDER)
                             .findFirst()
                             .orElse(null);
-                    if (border != null && plugin.scatter.time > border.triggerTime()) {
+                    if (border != null && plugin.scatter.time < border.triggerTime()) {
                         continue;
                     }
                 }
@@ -83,7 +83,7 @@ public class Scoreboards {
                             .filter(e -> e.type() == GameEventType.END_BORDER)
                             .findFirst().orElse(null);
                     if (endBorder != null) {
-                        int borderSeconds = Math.max(plugin.scatter.time - endBorder.triggerTime(), 0);
+                        int borderSeconds = Math.max(endBorder.triggerTime() - plugin.scatter.time, 0);
                         if (borderSeconds == seconds) {
                             continue;
                         }
@@ -98,7 +98,7 @@ public class Scoreboards {
                     case VERTICAL_BORDER     -> "&dBorde Vertical&f: ";
                     case END_BORDER          -> "&4Borde Final&f: ";
                     case END_VERTICAL_BORDER -> "&4Borde Vertical Final&f: ";
-                    case GLOWING             -> "&eGlowing: ";
+                    case GLOWING             -> "&eGlowing&f: ";
                 };
 
                 shownEvents.add(plugin.utils.chat(label + timeStr));

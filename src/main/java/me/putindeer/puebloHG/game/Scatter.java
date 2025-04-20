@@ -2,7 +2,6 @@ package me.putindeer.puebloHG.game;
 
 import lombok.Getter;
 import me.putindeer.puebloHG.Main;
-import me.putindeer.puebloHG.config.locations.LocationManager;
 import me.putindeer.puebloHG.utils.Utils;
 import me.putindeer.puebloHG.config.game.GameEvent;
 import net.kyori.adventure.key.Key;
@@ -35,7 +34,6 @@ public class Scatter implements Listener {
     public Scatter(Main plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        plugin.locationManager = new LocationManager(plugin);
     }
 
     public void scatter() {
@@ -166,15 +164,14 @@ public class Scatter implements Listener {
     }
 
     private int getTimeUntilNextEvent(List<GameEvent> events) {
+        events.sort(Comparator.comparingInt(GameEvent::triggerTime));
         int timeUntilNextEvent = -1;
 
         for (GameEvent event : events) {
             int eventTime = event.triggerTime();
-            if (eventTime < time) {
-                int diff = time - eventTime;
-                if (timeUntilNextEvent == -1 || diff < timeUntilNextEvent) {
-                    timeUntilNextEvent = diff;
-                }
+            if (eventTime > time) {
+                timeUntilNextEvent = eventTime - time;
+                break;
             }
         }
         return timeUntilNextEvent;
