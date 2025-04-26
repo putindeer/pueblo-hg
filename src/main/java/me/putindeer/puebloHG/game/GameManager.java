@@ -216,6 +216,7 @@ public class GameManager implements Listener {
 
         if (started) {
             Player p = event.getPlayer();
+            if (!plugin.alivePlayers.contains(p.getUniqueId())) return;
             Player killer = p.getKiller();
 
             Component deathMessage = handleDeathMessage(event.deathMessage(), p, killer);
