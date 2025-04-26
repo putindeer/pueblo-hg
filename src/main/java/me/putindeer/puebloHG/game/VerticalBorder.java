@@ -31,7 +31,7 @@ public class VerticalBorder {
     }
 
     public void start(int time) {
-        transitionTime = time;
+        transitionTime = time * 20;
         startBorderShrinkTask();
         startDamageTask();
         startBorderDisplayTask();
