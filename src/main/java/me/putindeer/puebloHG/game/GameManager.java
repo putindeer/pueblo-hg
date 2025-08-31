@@ -1,7 +1,6 @@
 package me.putindeer.puebloHG.game;
 
 import me.putindeer.puebloHG.Main;
-import me.putindeer.puebloHG.utils.Utils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -179,7 +178,10 @@ public class GameManager implements Listener {
         for (Player p : Bukkit.getOnlinePlayers()) {
             Location loc = new Location(Bukkit.getWorld("world"), -999.5, 100, 1000.5);
             p.teleport(loc);
-            Utils.restorePlayer(p);
+            plugin.utils.restorePlayer(p);
+            p.getInventory().clear();
+            p.setStatistic(Statistic.PLAYER_KILLS, 0);
+            p.setWorldBorder(p.getWorld().getWorldBorder());;
             p.setGameMode(GameMode.SURVIVAL);
         }
 

@@ -10,7 +10,7 @@ import me.putindeer.puebloHG.game.Scatter;
 import me.putindeer.puebloHG.game.VerticalBorder;
 import me.putindeer.puebloHG.utils.StartThings;
 import org.bukkit.plugin.java.JavaPlugin;
-import us.polarismc.api.util.PluginUtils;
+import me.putindeer.api.util.PluginUtils;
 
 import java.util.*;
 

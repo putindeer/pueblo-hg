@@ -98,9 +98,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>us.polarismc</groupId>
-            <artifactId>polaris-api</artifactId>
-            <version>1.0.2</version>
+            <groupId>com.github.putindeer</groupId>
+            <artifactId>mcdev-utils</artifactId>
+            <version>1.0.4</version>
         </dependency>
     </dependencies>
 </project>

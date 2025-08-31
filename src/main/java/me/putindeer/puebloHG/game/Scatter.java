@@ -2,7 +2,6 @@ package me.putindeer.puebloHG.game;
 
 import lombok.Getter;
 import me.putindeer.puebloHG.Main;
-import me.putindeer.puebloHG.utils.Utils;
 import me.putindeer.puebloHG.config.game.GameEvent;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -71,7 +70,10 @@ public class Scatter implements Listener {
                     Player p = playerIterator.next();
                     p.teleportAsync(nextLocation);
                     p.setGameMode(GameMode.SURVIVAL);
-                    Utils.restorePlayer(p);
+                    plugin.utils.restorePlayer(p);
+                    p.getInventory().clear();
+                    p.setStatistic(Statistic.PLAYER_KILLS, 0);
+                    p.setWorldBorder(p.getWorld().getWorldBorder());
                     scattering.add(p);
                     plugin.alivePlayers.add(p.getUniqueId());
                     scattered[0]++;
